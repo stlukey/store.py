@@ -14,14 +14,14 @@ def create_app(config=DevelopmentConfig):
     return app
 
 def mongodb(app):
-    from .store.models import to_register
     from mongokit import Connection
+    from .store.models import to_register
 
-    conn = Connection(app.config['MONGODB_HOST'],
-                      app.config['MONGODB_PORT'])
+    app.db = Connection(app.config['MONGODB_HOST'],
+                        app.config['MONGODB_PORT'])
 
     for document in to_register:
-        conn.register(document)
+         app.db.register(document)
 
 
 def register_blueprints(app):

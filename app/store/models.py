@@ -3,7 +3,8 @@
 Data model.
 """
 
-from mongokit import Document
+from mongokit import Document, Connection
+from flask import current_app
 from datetime import datetime
 
 to_register = []
