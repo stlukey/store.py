@@ -17,6 +17,7 @@ class BaseDocument(Document):
 class AutorefsDocument(BaseDocument):
     user_autorefs = True
 
+
 @register
 class User(BaseDocument):
     __collection__ = 'users'
@@ -61,6 +62,7 @@ class Address(AutorefsDocument):
         'postcode'
     }
 
+
 @register
 class DefaultAddresses(AutorefsDocument):
     __collection__ = 'default_addresses'
@@ -71,6 +73,7 @@ class DefaultAddresses(AutorefsDocument):
     }
     required_feilds = structure.keys()
 
+
 @register
 class Image(Document):
     __collection__ = 'images'
@@ -78,6 +81,7 @@ class Image(Document):
         'path': str
     }
     required_feilds = ['path']
+
 
 @register
 class Product(Document):
@@ -87,46 +91,51 @@ class Product(Document):
         'cost': float,
         'description': str,
         'stock': int,
+        'thumbnail': Image,
+        'images': {
+            'display': [Image],
+            'other': [Image]
+        }
     }
     required_feilds = structure.keys()
 
 @register
-class ProductImage(AutorefsDocument):
-    __collection__ = 'product_images'
+class Category(BaseDocument):
+    __collection__ = 'categories'
     structure = {
-        'image': Image,
+            'name': str
+    }
+    required_feilds = ['name']
+
+
+@register
+class ProductToCategory(AutorefsDocument):
+    __collection__ = 'products_to_categories'
+    structure = {
+        'product': Product,
+        'category': Category
+    }
+    required_feilds = structure.keys()
+
+
+@register
+class Recipe(BaseDocument):
+    __collection__ = 'recipes'
+    structure = {
+        'name': str,
+        'url': str
+    }
+
+
+@register
+class ProductToRecipe(AutorefsDocument):
+    __collection__ = 'products_to_recipes'
+    structure = {
+        'recipe': Recipe,
         'product': Product
     }
     required_feilds = structure.keys()
 
-@register
-class ThumbnailImage(ProductImage):
-    __collection__ = 'thumbnail_images' 
-    structure = {
-        'image': ProductImage,
-    }
-
-@register
-class DisplayImage(ProductImage):
-    __collection__ = 'display_images'
-    structure = {
-        'image': ProductImage,
-    }
-
-@register
-class Payment(BaseDocument):
-    __collection__ = 'payments'
-    structure = {
-        'amount': float,
-        'currency': str,
-        'ref': str,
-        'datetime': datetime
-    }
-    required_feilds = structure.keys()
-    default_values = {
-        'currency': 'GBP',
-        'datetime': datetime.now
-    }
 
 @register
 class Shipment(BaseDocument):
@@ -139,38 +148,42 @@ class Shipment(BaseDocument):
         'create_time': datetime.now
     }
 
+
 @register
 class Order(AutorefsDocument):
     __collections__ = 'orders'
     structure = {
         'user': User,
         'datetime': datetime,
-        'billing_address': Address,
-        'shipping_address': Address,
-        'payment': Payment,
+        'payment': {
+            'address': Address,
+            'amount': float,
+            'currency': str,
+            'ref': str,
+            'datetime': datetime
+        },
+        'shipping': {
+            'address': Address,
+            'method': int,
+            'shipment': Shipment,
+            'tracking_id': str,
+        },
+        'items': [{
+            'product': Product,
+            'quantity': int,
+        }]
     }
-    required_feilds = structure.keys()
+    required_feilds = [
+        'user',
+        'datetime',
+        'payment',
+        'shipping.address',
+        'shipping.method',
+        'items'
+    ]
     default_values = {
-        'datetime': datetime.now
+        'datetime': datetime.now,
+        'payment.datetime': datetime.now,
+        'payment.currency': 'GBP',
     }
-
-@register
-class ShippedOrder(AutorefsDocument):
-    __collections__ = 'shipped_orders'
-    structure = {
-        'shipment': Shipment,
-        'order': Order,
-        'tacking_id': str,
-    }
-    required_feilds = structure.keys()
-
-@register
-class OrderItems(AutorefsDocument):
-    __collections__ = 'order_items'
-    structure = {
-        'order': Order,
-        'product': Product,
-        'amount': int
-    }
-    required_feilds = structure.keys()
 
