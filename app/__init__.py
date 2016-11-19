@@ -1,9 +1,20 @@
+#!/usr/bin/env python
 """
+Main application.
 """
 
 from flask import Flask
-from .store import store_bp
+from .config import BaseConfig
 
-app = Flask(__name__)
-app.register_blueprint(store_bp)
+def create_app(config=BaseConfig):
+    app = Flask(__name__)
+    register_blueprints(app)
+    app.config.from_object(config)
+    return app
+
+def register_blueprints(app):
+    from store import store
+
+    for bp in [store]:
+        app.register_blueprint(bp)
 
