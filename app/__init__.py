@@ -4,7 +4,7 @@ Main application.
 """
 
 from flask import Flask
-from .config import BaseConfig
+from .config import DevelopmentConfig
 
 def create_app(config=DevelopmentConfig):
     app = Flask(__name__)

@@ -29,7 +29,7 @@ class User(BaseDocument):
         'create_time': datetime
     }
     default_values = {
-        'create_time': timedate.now
+        'create_time': datetime.now
     }
     required_feilds = [
         'email',
@@ -146,7 +146,7 @@ class Order(AutorefsDocument):
         'user': User,
         'datetime': datetime,
         'billing_address': Address,
-        'shipping_address': Adress,
+        'shipping_address': Address,
         'payment': Payment,
     }
     required_feilds = structure.keys()

@@ -24,6 +24,7 @@ def freeze():
 
     print("Success!")
 
+
 def commit_install(package):
     print("Commiting changes to requirements.txt ...")
     msg = "Added '{}' to requirements.txt".format(package)
@@ -34,6 +35,7 @@ def commit_install(package):
         return print("Failure! There was an error.")
 
     print("Success")
+
 
 @manager.command
 def install(package):
@@ -50,6 +52,13 @@ def install(package):
     freeze()
     commit(package)
 
+@manager.command
+def run(production=False):
+    current_app = app
+    if production:
+        # TODO: Apply Production config.
+        current_app != app
+    app.run()
 
 if __name__ == '__main__':
     manager.run()
