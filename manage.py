@@ -4,10 +4,11 @@ Manage script.
 """
 
 from flask_script import Manager
-from app import app
+from app import create_app
 
 from sh import pip, ErrorReturnCode
 
+app = create_app()
 manager = Manager(app)
 
 @manager.command

@@ -7,8 +7,8 @@ Flask-WTF==0.13.1
 itsdangerous==0.24
 Jinja2==2.8
 MarkupSafe==0.23
-mongokit==0.9.1.1
-pymongo==3.3.1
+mongokit-py3==0.9.1.1
+pymongo==2.8
 sh==1.11
 SQLAlchemy==0.7.8
 Werkzeug==0.11.11
