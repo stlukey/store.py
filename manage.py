@@ -23,6 +23,31 @@ def freeze():
 
     print("Success!")
 
+def commit_install(package):
+    print("Commiting changes to requirements.txt ...")
+    msg = "Added '{}' to requirements.txt".format(package)
+
+    try:
+        git('commit requirements.txt', '-m', msg, _out=print)
+    except:
+        return print("Failure! There was an error.")
+
+    print("Success")
+
+@manager.command
+def install(package):
+    """Installs package, freezes and commits.
+    """
+    print("Installing '{}'...".format(package))
+
+    try:
+        pip('install', package, _out=print)
+    except:
+        return print("Failure! There was an error.!")
+
+    print("Success!")
+    freeze()
+    commit(package)
 
 
 if __name__ == '__main__':
