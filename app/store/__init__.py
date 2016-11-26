@@ -2,5 +2,3 @@
 """
 
 from .views import store
-
-

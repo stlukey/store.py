@@ -3,9 +3,11 @@
 Configurations
 """
 
+
 class BaseConfig(object):
     DEBUG = False
     TESTING = False
+
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
@@ -14,7 +16,5 @@ class DevelopmentConfig(BaseConfig):
     MONGODB_PORT = 27017
 
 
-
 class TestConfig(BaseConfig):
     TESTING = True
-

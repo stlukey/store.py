@@ -1,0 +1,19 @@
+{
+  "name": "online-store",
+  "description": "",
+  "main": "manage.py",
+  "authors": [
+    "Luke Southam"
+  ],
+  "license": "",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/static/bower_components",
+    "test",
+    "tests"
+  ]
+}

@@ -3,23 +3,27 @@
 Data model.
 """
 
-from mongokit import Document, Connection
-from flask import current_app
+from mongokit import Document
 from datetime import datetime
 
 to_register = []
-def register(document):
+
+
+def register_doc(document):
     to_register.append(document)
     return document
 
+
 class BaseDocument(Document):
+    __database__ = 'store'
     use_dot_notation = True
+
 
 class AutorefsDocument(BaseDocument):
     user_autorefs = True
 
 
-@register
+@register_doc
 class User(BaseDocument):
     __collection__ = 'users'
     structure = {
@@ -41,7 +45,8 @@ class User(BaseDocument):
         'contact_num'
     ]
 
-@register
+
+@register_doc
 class Address(AutorefsDocument):
     __collection__ = 'addresses'
     structure = {
@@ -64,7 +69,7 @@ class Address(AutorefsDocument):
     }
 
 
-@register
+@register_doc
 class DefaultAddresses(AutorefsDocument):
     __collection__ = 'default_addresses'
     structure = {
@@ -75,7 +80,7 @@ class DefaultAddresses(AutorefsDocument):
     required_feilds = structure.keys()
 
 
-@register
+@register_doc
 class Image(Document):
     __collection__ = 'images'
     structure = {
@@ -84,7 +89,7 @@ class Image(Document):
     required_feilds = ['path']
 
 
-@register
+@register_doc
 class Product(Document):
     __collection__ = 'products'
     structure = {
@@ -100,16 +105,17 @@ class Product(Document):
     }
     required_feilds = structure.keys()
 
-@register
+
+@register_doc
 class Category(BaseDocument):
     __collection__ = 'categories'
     structure = {
-            'name': str
+        'name': str
     }
     required_feilds = ['name']
 
 
-@register
+@register_doc
 class ProductToCategory(AutorefsDocument):
     __collection__ = 'products_to_categories'
     structure = {
@@ -119,7 +125,7 @@ class ProductToCategory(AutorefsDocument):
     required_feilds = structure.keys()
 
 
-@register
+@register_doc
 class Recipe(BaseDocument):
     __collection__ = 'recipes'
     structure = {
@@ -128,7 +134,7 @@ class Recipe(BaseDocument):
     }
 
 
-@register
+@register_doc
 class ProductToRecipe(AutorefsDocument):
     __collection__ = 'products_to_recipes'
     structure = {
@@ -138,7 +144,7 @@ class ProductToRecipe(AutorefsDocument):
     required_feilds = structure.keys()
 
 
-@register
+@register_doc
 class Shipment(BaseDocument):
     __collections__ = 'shipments'
     structure = {
@@ -150,7 +156,7 @@ class Shipment(BaseDocument):
     }
 
 
-@register
+@register_doc
 class Order(AutorefsDocument):
     __collections__ = 'orders'
     structure = {
@@ -187,4 +193,3 @@ class Order(AutorefsDocument):
         'payment.datetime': datetime.now,
         'payment.currency': 'GBP',
     }
-
