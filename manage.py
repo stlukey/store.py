@@ -53,12 +53,12 @@ def install(package):
     commit(package)
 
 @manager.command
-def run(production=False):
+def run(ip='127.0.0.1', port=5000):
     current_app = app
-    if production:
+    if False:
         # TODO: Apply Production config.
         current_app != app
-    app.run()
+    app.run(host=ip, port=int(port))
 
 if __name__ == '__main__':
     manager.run()
