@@ -14,4 +14,4 @@ def display_product(pid):
 
 @store.route('/')
 def store_front():
-    return render_template('store/base.html')
+    return render_template('store/index.html')
