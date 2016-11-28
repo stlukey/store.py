@@ -26,7 +26,7 @@ class AutorefsDocument(BaseDocument):
 
 @register_doc
 class User(BaseDocument):
-    __collection__  = 'users'
+    __collection__ = 'users'
     structure = {
         'email': str,
         'password': str,

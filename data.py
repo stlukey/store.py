@@ -54,7 +54,7 @@ def create_sample():
         product.save()
 
         for category_name in product_info['categories']:
-            category = app.db.Category.one({'name':category_name})
+            category = app.db.Category.one({'name': category_name})
             if category is None:
                 category = app.db.Category()
                 category.name = category_name
@@ -65,10 +65,14 @@ def create_sample():
             product_to_category.save()
 
         with open(product_info['image'], 'rb') as src:
-            with product.fs.new_file('images/thumbnail.jpg'.format(product._id)) as dest:
+            with product.fs.new_file(
+                'images/thumbnail.jpg'.format(product._id)
+            ) as dest:
                 copy_image(src, dest)
 
-            with product.fs.new_file('images/image1.jpg'.format(product._id)) as dest:
+            with product.fs.new_file(
+                'images/image1.jpg'.format(product._id)
+            ) as dest:
                 copy_image(src, dest)
 
         print("Adding '{}'...".format(product.name))
