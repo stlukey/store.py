@@ -1,6 +1,6 @@
 {
     "name": "Saffron",
-    "category": "Spices",
+    "categories": ["Spices"],
     "cost": 4.95,
     "description": "1 gram, best quality Persian saffron",
     "stock": 10,

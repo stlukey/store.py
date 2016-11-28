@@ -1,6 +1,6 @@
 {
     "name": "Sundried Persian plums",
-    "category": "Special offers",
+    "categories": ["Special offers"],
     "cost": 5.99,
     "description": "100 grams sundried golden plumspecial offers",
     "stock": 10,
