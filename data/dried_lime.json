@@ -1,0 +1,17 @@
+{
+    "name": "Dried lime",
+    "category": "Spices",
+    "cost": 2.99,
+    "description": "Sundried fermented Persian limes",
+    "stock": 10,
+    "links": [
+        {
+            "name": "Persian Aubergine (Eggplant) Stew with Meatballs & Dried Lime",
+            "url": "http://www.thepersianfusion.com/persian-aubergine-eggplant-stew-with-meatballs-dried-lime/"
+        },
+        {
+            "name": "Persian Rose petals and Borage Flowers Herbal Tea",
+            "url": "http://www.thepersianfusion.com/herbal-tea-with-persian-rose-and-borage-flowers/"
+        }
+    ]
+}

@@ -1,0 +1,17 @@
+{
+    "name": "Slivered almonds",
+    "category": "Nuts &amp; Dried Fruit",
+    "cost": 1.99,
+    "description": "100g",
+    "stock": 10,
+    "links": [
+        {
+            "name": "Quinoa Salad with Barberries & Nuts",
+            "url": "http://www.thepersianfusion.com/quinoa-salad-with-barberries-and-nuts/"
+        },
+        {
+            "name": "Persian-Style Jewelled Butternut Squash Rice",
+            "url": "http://www.thepersianfusion.com/persian-style-jewelled-butternut-squash-rice/"
+        }
+    ]
+}

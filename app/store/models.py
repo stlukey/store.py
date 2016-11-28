@@ -16,6 +16,7 @@ def register_doc(document):
 
 class BaseDocument(Document):
     __database__ = 'store'
+    __collection__ = 'store'
     use_dot_notation = True
 
 
@@ -25,7 +26,7 @@ class AutorefsDocument(BaseDocument):
 
 @register_doc
 class User(BaseDocument):
-    __collection__ = 'users'
+    __collection__  = 'users'
     structure = {
         'email': str,
         'password': str,
@@ -81,29 +82,26 @@ class DefaultAddresses(AutorefsDocument):
 
 
 @register_doc
-class Image(Document):
-    __collection__ = 'images'
-    structure = {
-        'path': str
-    }
-    required_feilds = ['path']
-
-
-@register_doc
-class Product(Document):
+class Product(BaseDocument):
     __collection__ = 'products'
     structure = {
         'name': str,
         'cost': float,
         'description': str,
         'stock': int,
-        'thumbnail': Image,
-        'images': {
-            'display': [Image],
-            'other': [Image]
-        }
+        'links': [{
+            'name': str,
+            'url': str
+        }]
     }
     required_feilds = structure.keys()
+    gridfs = {
+        'files': ['thumbnail'],
+        'containers': [
+            'display_images',
+            'other_images',
+        ]
+    }
 
 
 @register_doc
@@ -121,25 +119,6 @@ class ProductToCategory(AutorefsDocument):
     structure = {
         'product': Product,
         'category': Category
-    }
-    required_feilds = structure.keys()
-
-
-@register_doc
-class Recipe(BaseDocument):
-    __collection__ = 'recipes'
-    structure = {
-        'name': str,
-        'url': str
-    }
-
-
-@register_doc
-class ProductToRecipe(AutorefsDocument):
-    __collection__ = 'products_to_recipes'
-    structure = {
-        'recipe': Recipe,
-        'product': Product
     }
     required_feilds = structure.keys()
 

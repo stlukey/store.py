@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Manage script.
 """
@@ -6,10 +6,11 @@ Manage script.
 from flask_script import Manager
 from app import create_app
 
-from sh import pip, ErrorReturnCode
+from sh import pip, git, ErrorReturnCode
 
 app = create_app()
 manager = Manager(app)
+
 
 @manager.command
 def freeze():
@@ -50,7 +51,8 @@ def install(package):
 
     print("Success!")
     freeze()
-    commit(package)
+    commit_install(package)
+
 
 @manager.command
 def run(ip='127.0.0.1', port=5000):
@@ -62,4 +64,3 @@ def run(ip='127.0.0.1', port=5000):
 
 if __name__ == '__main__':
     manager.run()
-

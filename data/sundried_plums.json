@@ -1,0 +1,21 @@
+{
+    "name": "Sundried Persian plums",
+    "category": "Special offers",
+    "cost": 5.99,
+    "description": "100 grams sundried golden plumspecial offers",
+    "stock": 10,
+    "links": [
+        {
+            "name": "Persian Sweet & Sour Chicken Meatballs with Carrots & Prunes",
+            "url": "http://www.thepersianfusion.com/persian-chicken-meatballs-carrots-prunes-khoresht-e-havij-o-aloo/"
+        },
+        {
+            "name": "Persian Style Lamb Shanks in Tomato Sauce with Prunes & Fried Potatoes",
+            "url": "http://www.thepersianfusion.com/persian-style-lamb-shanks-in-tomato-sauce-with-prunes-fried-potatoes-2/"
+        },
+        {
+            "name": "Persian Meatless Herby “Meatballs” (koofteh sabzi)",
+            "url": "http://www.thepersianfusion.com/meatless-herby-persian-style-meatballs-kufteh-sabzi/"
+        }
+    ]
+}

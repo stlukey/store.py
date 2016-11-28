@@ -1,0 +1,21 @@
+{
+    "name": "Saffron",
+    "category": "Spices",
+    "cost": 4.95,
+    "description": "1 gram, best quality Persian saffron",
+    "stock": 10,
+    "links": [
+        {
+            "name": "Persian-Style Saffron, Cauliflower & Broccoli Frittata (kookoo)",
+            "url": "http://www.thepersianfusion.com/persian-style-saffron-cauliflower-broccoli-frittata-kookoo/"
+        },
+        {
+            "name": "Saffron and Walnut Courgette Cake with Oat Bran",
+            "url": "http://www.thepersianfusion.com/saffron-and-walnut-courgette-cake-with-oat-bran/"
+        },
+        {
+            "name": "Healthy Persian-Style Saffron Chicken",
+            "url": "http://www.thepersianfusion.com/healthy-persian-style-saffron-chicken/"
+        }
+    ]
+}

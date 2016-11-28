@@ -1,0 +1,13 @@
+{
+    "name": "Verjuice",
+    "category": "Vinegars",
+    "cost": 2.99,
+    "description": "400ml bottle of slightly fermented sour grape juice",
+    "stock": 10,
+    "links": [
+        {
+            "name": "Meatball Stuffed Aubergine Bundles in Verjuice Sauce",
+            "url": "http://www.thepersianfusion.com/meatball-stuffed-aubergine-bundles-in-verjuice-sauce/"
+        }
+    ]
+}
