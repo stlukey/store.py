@@ -22,7 +22,7 @@ def images(product_id, file_name):
 @products.route('/<product_id>/<product_name>')
 def view_product(product_id, product_name=None):
     product = queries.product_get_or_abort(product_id)
-    categories = queries.product_find_categories(product_id)
+    categories = queries.product_find_categories(product)
 
     return render_template('products/view_product.html',
                            product=product,

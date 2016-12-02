@@ -4,15 +4,18 @@ from bson.objectid import ObjectId
 from bson import errors as bson_errors
 from gridfs import errors as gridfs_errors
 
+
 def product_get(product_id):
     if not isinstance(product_id, ObjectId):
         product_id = ObjectId(product_id)
 
     return current_app.db.Product.get_from_id(product_id)
 
+
 def product_get_image(product, file_name):
     with product.fs.get_last_version('images/{}'.format(file_name)) as f:
             return f.read()
+
 
 def product_find_by_category(category):
     category = current_app.db.Category.find_one({'name': category})
