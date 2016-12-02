@@ -129,7 +129,7 @@
       <div class="container"> 
         <div class="col-7">
           <div class="product col-md-4 service-image-left">
-            {% set image = url_for('product.images', product_id=product._id, file_name='thumbnail.jpg') %}
+            {% set image = url_for('products.images', product_id=product._id, file_name='thumbnail.jpg') %}
             <center>
               <img id="item-display" src="{{ image }}" alt=""></img>
             </center>
@@ -153,9 +153,8 @@
         <div class="col-md-6">
           <h1>{{ product.name }}</h1>
           <div class="product-desc">{{ product.description }}</div>
-          <div class="product-categories">In: 
-          {{ categories[0] }}
-          </div> 
+          <hr>
+          <div class="product-categories">In: {{ ', '.join(categories) }}</div>
           <hr>
           <div class="product-cost">{{ product.cost }}</div>
           <div class="product-stock">

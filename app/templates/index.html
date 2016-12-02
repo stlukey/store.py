@@ -20,23 +20,23 @@
       </ol>
       <div class="carousel-inner" role="listbox">
         <div class="item active">
-          <img src="{{ url_for('product.images', product_id=latest[0]._id, file_name='thumbnail.jpg') }}" alt="slide">
+          <img src="{{ url_for('products.images', product_id=latest[0]._id, file_name='thumbnail.jpg') }}" alt="slide">
           <div class="container">
             <div class="carousel-caption">
               <h1>{{ latest[0].name }}</h1>
               <p>{{ latest[0].description }}</p>
-              <a href="#" class="btn btn-primary">Buy Now!</a> <a href="{{ url_for('product.view', product_id=latest[0]._id, product_name='-'.join(latest[0].name.lower().split())) }}" class="btn btn-default">More Info</a>
+              <a href="#" class="btn btn-primary">Buy Now!</a> <a href="{{ url_for('products.view_product', product_id=latest[0]._id, product_name='-'.join(latest[0].name.lower().split())) }}" class="btn btn-default">More Info</a>
             </div>
           </div>
         </div>
     {% for product in latest[1:] %}
         <div class="item">
-          <img src="{{ url_for('product.images', product_id=product._id, file_name='thumbnail.jpg') }}" alt="slide">
+          <img src="{{ url_for('products.images', product_id=product._id, file_name='thumbnail.jpg') }}" alt="slide">
           <div class="container">
             <div class="carousel-caption">
               <h1>{{ product.name }}</h1>
               <p>{{ product.description }}</p>
-              <a href="#" class="btn btn-primary">Buy Now!</a> <a href="{{ url_for('product.view', product_id=product._id, product_name='-'.join(product.name.lower().split())) }}" class="btn btn-default">More Info</a>
+              <a href="#" class="btn btn-primary">Buy Now!</a> <a href="{{ url_for('products.view_product', product_id=product._id, product_name='-'.join(product.name.lower().split())) }}" class="btn btn-default">More Info</a>
             </div>
           </div>
         </div>
@@ -68,12 +68,12 @@
     {% for product in most_popular %}
     <div class="col-md-3 col-sm-6 hero-feature">
         <div class="thumbnail">
-            <img src="{{ url_for('product.images', product_id=product._id, file_name='thumbnail.jpg') }}" alt=""/>
+            <img src="{{ url_for('products.images', product_id=product._id, file_name='thumbnail.jpg') }}" alt=""/>
             <div class="caption">
                 <h3>{{ product.name }}</h3>
                 <p>{{ product.description }}</p>
                 <p>
-                    <a href="#" class="btn btn-primary">Buy Now!</a> <a href="{{ url_for('product.view', product_id=product._id, product_name='-'.join(product.name.lower().split())) }}" class="btn btn-default">More Info</a>
+                    <a href="#" class="btn btn-primary">Buy Now!</a> <a href="{{ url_for('products.view_product', product_id=product._id, product_name='-'.join(product.name.lower().split())) }}" class="btn btn-default">More Info</a>
                 </p>
             </div>
         </div>

@@ -5,7 +5,7 @@ from datetime import datetime
 from ..users.models import User, Address
 from ..admin.models import Shipment
 
-from ..product.models import Product
+from ..products.models import Product
 
 
 @db_register

@@ -43,7 +43,7 @@ def setup_assets(app):
 
 def register_blueprints(app):
     from .views import store as store_bp
-    from .modules.product import product_bp
+    from .modules.products import products_bp
 
     app.register_blueprint(store_bp)
-    app.register_blueprint(product_bp, url_prefix='/products')
+    app.register_blueprint(products_bp, url_prefix='/products')
