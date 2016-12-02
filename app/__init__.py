@@ -9,6 +9,8 @@ from flask import Flask
 from flask_assets import Environment
 from .config import DevelopmentConfig
 
+from .models import init_db_docs
+
 
 def create_app(config=DevelopmentConfig):
     app = Flask(__name__)
@@ -23,26 +25,25 @@ def create_app(config=DevelopmentConfig):
 
 def setup_mongodb(app):
     from mongokit import Connection
-    from .store.models import to_register
 
     app.db = Connection(app.config['MONGODB_HOST'],
                         app.config['MONGODB_PORT'])
 
-    for document in to_register:
-        app.db.register(document)
+    init_db_docs(app)
 
 
 def setup_assets(app):
     app.env = Environment(app)
     app.env.load_path = [
-        ospath.join(ospath.dirname(__file__), 'less'),
-        ospath.join(ospath.dirname(__file__), 'coffee'),
-        ospath.join(ospath.dirname(__file__), 'bower_components'),
+        ospath.join(ospath.dirname(__file__), 'static/less'),
+        ospath.join(ospath.dirname(__file__), 'static/coffee'),
+        ospath.join(ospath.dirname(__file__), 'static/bower_components'),
     ]
 
 
 def register_blueprints(app):
-    from .store import store
+    from .views import store as store_bp
+    from .modules.product import product_bp
 
-    for bp in [store]:
-        app.register_blueprint(bp)
+    app.register_blueprint(store_bp)
+    app.register_blueprint(product_bp, url_prefix='/products')
