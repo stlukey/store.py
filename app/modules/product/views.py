@@ -32,26 +32,3 @@ def view(product_id, product_name=None):
     return render_template('product/product.html',
                            product=product,
                            categories=categories)
-
-
-@product.route('/')
-def product_front():
-    popular = []
-    while len(popular) < 4:
-        product = current_app.db.Product.find_random()
-        if product not in popular:
-            popular.append(product)
-
-    latest = [
-        current_app.db.Product
-                      .find_random(),
-        current_app.db.Product
-                      .find_random(),
-        current_app.db.Product
-                      .find_random()
-    ]
-    print(latest)
-
-    return render_template('product/index.html',
-                           most_popular=popular,
-                           latest=latest)
