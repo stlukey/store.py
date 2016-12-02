@@ -87,19 +87,21 @@ class Product(BaseDocument):
     structure = {
         'name': str,
         'cost': float,
+        'date_added': datetime,
         'description': str,
         'stock': int,
-        'links': [{
+        'recipes': [{
             'name': str,
             'url': str
         }]
     }
+    default_feilds = {
+        'date_added': datetime.now
+    }
     required_feilds = structure.keys()
     gridfs = {
-        'files': ['thumbnail'],
         'containers': [
-            'display_images',
-            'other_images',
+            'images'
         ]
     }
 

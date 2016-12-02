@@ -50,7 +50,7 @@ def create_sample():
         product.description = product_info['description']
         product.stock = product_info['stock']
 
-        product.links = product_info['links']
+        product.recipes = product_info['links']
         product.save()
 
         for category_name in product_info['categories']:

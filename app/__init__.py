@@ -35,7 +35,7 @@ def setup_mongodb(app):
 def setup_assets(app):
     app.env = Environment(app)
     app.env.load_path = [
-        ospath.join(ospath.dirname(__file__), 'sass'),
+        ospath.join(ospath.dirname(__file__), 'less'),
         ospath.join(ospath.dirname(__file__), 'coffee'),
         ospath.join(ospath.dirname(__file__), 'bower_components'),
     ]
