@@ -1,8 +1,9 @@
-from ...models import BaseDocument, AutorefsDocument, db_register
+from ...models import BaseDocument, AutorefsDocument, PartialConnection
 from datetime import datetime
 
+conn = PartialConnection()
 
-@db_register
+@conn.register
 class User(BaseDocument):
     __collection__ = 'users'
     structure = {
@@ -25,7 +26,7 @@ class User(BaseDocument):
     ]
 
 
-@db_register
+@conn.register
 class Address(AutorefsDocument):
     __collection__ = 'addresses'
     structure = {
@@ -48,7 +49,7 @@ class Address(AutorefsDocument):
     }
 
 
-@db_register
+@conn.register
 class DefaultAddresses(AutorefsDocument):
     __collection__ = 'default_addresses'
     structure = {

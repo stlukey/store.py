@@ -6,12 +6,22 @@ Data model.
 from mongokit import Document
 from importlib import import_module
 
-to_register = []
+conns = []
 
 
-def db_register(doc):
-    if doc not in to_register:
-        to_register.append(doc)
+class PartialConnection(object):
+    def __init__(self):
+        conns.append(self)
+        self.documents = []
+
+    def register(self, doc):
+        self.documents.append(doc)
+        return doc
+
+    def complete(self, connection):
+        for doc in self.documents:
+            print("Registering Document:", doc.__name__)
+            connection.register(doc)
 
 
 class BaseDocument(Document):
@@ -26,6 +36,5 @@ class AutorefsDocument(BaseDocument):
 
 def init_db_docs(app):
     import_module('app.modules')
-    for doc in to_register:
-        print("Registering Document:", doc.__name__)
-        app.db.register(doc)
+    for conn in conns:
+        conn.complete(app.db)

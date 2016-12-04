@@ -1,4 +1,4 @@
-from ...models import AutorefsDocument, db_register
+from ...models import AutorefsDocument, PartialConnection
 
 from datetime import datetime
 
@@ -7,8 +7,9 @@ from ..admin.models import Shipment
 
 from ..products.models import Product
 
+conn = PartialConnection()
 
-@db_register
+@conn.register
 class Order(AutorefsDocument):
     __collections__ = 'orders'
     structure = {

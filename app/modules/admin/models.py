@@ -1,9 +1,11 @@
 
 from datetime import datetime
 
-from ...models import BaseDocument, db_register
+from ...models import BaseDocument, PartialConnection
 
-@db_register
+conn = PartialConnection()
+
+@conn.register
 class Shipment(BaseDocument):
     __collections__ = 'shipments'
     structure = {
