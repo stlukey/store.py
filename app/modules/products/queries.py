@@ -1,4 +1,4 @@
-from flask import current_app, abort
+from flask import current_app, abort, url_for
 from bson.objectid import ObjectId
 
 from bson import errors as bson_errors
@@ -34,11 +34,8 @@ def product_find_categories(product):
 
 
 def product_get_or_abort(product_id):
-    try:
-        product = product_get(product_id)
-        if not product:
-            abort(404)
-    except bson_errors.InvalidId:
+    product = product_get(product_id)
+    if not product:
         abort(404)
 
     return product
@@ -50,3 +47,11 @@ def product_get_image_or_abort(product, file_name):
             return f.read()
     except gridfs_errors.NoFile:
         abort(404)
+
+def categories_get_all(conn):
+    categories = []
+    for category in conn.Category.find():
+        name = category.name.replace('-', ' ').title()
+        url = url_for('products.view', category=category.name)
+        categories.append(tuple([name, url]))
+    return categories

@@ -6,9 +6,8 @@
 {% endblock head %}
 
 {% block content %}
-    <!-- Jumbotron Header -->
 
-<!-- Carousel
+    <!-- Carousel
     ================================================== -->
     <div id="myCarousel" class="carousel slide" data-ride="carousel">
       <!-- Indicators -->
@@ -20,7 +19,7 @@
       <div class="carousel-inner" role="listbox">
         <div class="item active">
           <img src="{{ url_for('products.images', product_id=latest[0]._id, file_name='thumbnail.jpg') }}" alt="slide">
-          <div class="container">
+          <div class="container">`
             <div class="carousel-caption">
               <h1>{{ latest[0].name }}</h1>
               <p>{{ latest[0].description }}</p>

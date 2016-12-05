@@ -2,14 +2,15 @@
 """
 """
 
-from flask import Blueprint, render_template, current_app, make_response
+from flask import Blueprint, current_app, make_response, render_template
 
 from . import queries
 
 products = Blueprint('products', __name__)
 
 
-@products.route('/<product_id>/images/<file_name>')
+
+@products.route('/<ObjectID:product_id>/images/<file_name>')
 def images(product_id, file_name):
     product = queries.product_get_or_abort(product_id)
     image = queries.product_get_image_or_abort(product, file_name)
@@ -18,15 +19,15 @@ def images(product_id, file_name):
     return response
 
 
-@products.route('/<product_id>')
-@products.route('/<product_id>/<product_name>')
+@products.route('/<ObjectID:product_id>')
+@products.route('/<ObjectID:product_id>/<product_name>')
 def view_product(product_id, product_name=None):
     product = queries.product_get_or_abort(product_id)
     categories = queries.product_find_categories(product)
 
     return render_template('products/view_product.html',
-                           product=product,
-                           categories=list(categories))
+                              product=product,
+                              categories=list(categories))
 
 
 @products.route('/category/<category>')
@@ -38,5 +39,5 @@ def view(category=None):
         products = current_app.db.Product.find()
 
     return render_template('products/view.html',
-                           products=products,
-                           category=category)
+                              products=products,
+                              category=category)

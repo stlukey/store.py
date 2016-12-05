@@ -4,17 +4,22 @@ Main application.
 """
 
 from flask import Flask
-from .config import DevelopmentConfig
+from .config import DevelopmentConfig, GlobalTemplateVars
 
 from .models import init_db_docs
-
+from .utils import ObjectIDConverter
 
 def create_app(config=DevelopmentConfig):
     app = Flask(__name__)
     app.config.from_object(config)
 
+    app.add_template_global(GlobalTemplateVars(app), 'global_vars')
+    app.url_map.converters['ObjectID'] = ObjectIDConverter
+
     register_blueprints(app)
     setup_mongodb(app)
+
+
 
     return app
 

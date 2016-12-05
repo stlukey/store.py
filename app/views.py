@@ -20,7 +20,6 @@ def store_front():
         current_app.db.Product
                       .find_random()
     ]
-    print(latest)
 
     return render_template('index.html',
                            most_popular=popular,
