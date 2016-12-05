@@ -48,9 +48,9 @@ def product_get_image_or_abort(product, file_name):
     except gridfs_errors.NoFile:
         abort(404)
 
-def categories_get_all(conn):
+def categories_get_all(*args):
     categories = []
-    for category in conn.Category.find():
+    for category in current_app.db.Category.find():
         name = category.name.replace('-', ' ').title()
         url = url_for('products.view', category=category.name)
         categories.append(tuple([name, url]))

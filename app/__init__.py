@@ -13,15 +13,12 @@ from .utils import ObjectIDConverter
 from .modules.products.queries import categories_get_all
 
 class GlobalTemplateVars(object):
-    def __init__(self, app):
-        self.app = app
-
-    categories = property(lambda self: categories_get_all(self.app.db))
+    categories = property(categories_get_all)
 
 
 def create_app(config=None):
     if config is None:
-        config = 'production'
+        config = 'development'
     print("Using '{}' config.".format(config))
     config = '../configs/{}.cfg'.format(config)
 
@@ -29,8 +26,9 @@ def create_app(config=None):
     app = Flask(__name__)
     app.config.from_pyfile(config)
 
-    app.add_template_global(GlobalTemplateVars(app), 'global_vars')
+    app.add_template_global(GlobalTemplateVars(), 'global_vars')
     app.url_map.converters['ObjectID'] = ObjectIDConverter
+    app.secret_key = app.config['SECRET']
 
     register_blueprints(app)
     setup_mongodb(app)
@@ -51,6 +49,10 @@ def setup_mongodb(app):
 def register_blueprints(app):
     from .views import store as store_bp
     from .modules.products import products_bp
+    from .modules.users import users_bp
+    from .modules.api import api_bp
 
     app.register_blueprint(store_bp)
     app.register_blueprint(products_bp, url_prefix='/products')
+    app.register_blueprint(users_bp)
+    app.register_blueprint(api_bp, url_prefix='/api')

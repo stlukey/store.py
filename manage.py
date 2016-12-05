@@ -7,6 +7,8 @@ from scripts import *
 
 from sh import pip, git, ErrorReturnCode
 
+from flask_script import Server
+
 
 @manager.command
 def freeze():
