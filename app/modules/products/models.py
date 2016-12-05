@@ -1,9 +1,11 @@
 
-from ...models import BaseDocument, AutorefsDocument, db_register
+from ...models import PartialConnection, BaseDocument, AutorefsDocument
 from datetime import datetime
 
+conn = PartialConnection()
 
-@db_register
+
+@conn.register
 class Product(BaseDocument):
     __collection__ = 'products'
     structure = {
@@ -28,7 +30,7 @@ class Product(BaseDocument):
     }
 
 
-@db_register
+@conn.register
 class Category(BaseDocument):
     __collection__ = 'categories'
     structure = {
@@ -37,7 +39,7 @@ class Category(BaseDocument):
     required_feilds = ['name']
 
 
-@db_register
+@conn.register
 class ProductToCategory(AutorefsDocument):
     __collection__ = 'products_to_categories'
     structure = {
