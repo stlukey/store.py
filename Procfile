@@ -1,1 +1,1 @@
-web: gunicorn scripts.production:app
+web: gunicorn scripts.heroku:app
