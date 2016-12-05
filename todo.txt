@@ -1,3 +1,0 @@
-x 2016-11-28 Inherit base +template in home view.
-Create display page.
-x 2016-11-28 Create script to store sample data in db.
