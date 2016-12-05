@@ -4,17 +4,14 @@ Data management.
 """
 import os
 import json
-from flask_script import Manager
-from app import create_app
 
-app = create_app()
-manager = Manager(app)
+from . import *
 
 
 @manager.command
 def drop_db():
     print("Dropping database ...")
-    app.db.drop_database('store')
+    manager.app.db.drop_database(manager.app.config['MONGODB_NAME'])
 
 
 def get_products():
@@ -44,7 +41,7 @@ def create_sample():
     print("Generating new database...")
     products = get_products()
     for product_info in products:
-        product = app.db.Product()
+        product = manager.app.db.Product()
         product.name = product_info['name']
         product.cost = product_info['cost']
         product.description = product_info['description']
@@ -54,12 +51,12 @@ def create_sample():
         product.save()
 
         for category_name in product_info['categories']:
-            category = app.db.Category.one({'name': category_name})
+            category = manager.app.db.Category.one({'name': category_name})
             if category is None:
-                category = app.db.Category()
+                category = manager.app.db.Category()
                 category.name = category_name
                 category.save()
-            product_to_category = app.db.ProductToCategory()
+            product_to_category = manager.app.db.ProductToCategory()
             product_to_category.product = product
             product_to_category.category = category
             product_to_category.save()

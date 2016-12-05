@@ -3,13 +3,9 @@
 Manage script.
 """
 
-from flask_script import Manager
-from app import create_app
+from scripts import *
 
 from sh import pip, git, ErrorReturnCode
-
-app = create_app()
-manager = Manager(app)
 
 
 @manager.command
@@ -53,14 +49,6 @@ def install(package):
     freeze()
     commit_install(package)
 
-
-@manager.command
-def run(ip='127.0.0.1', port=5000):
-    current_app = app
-    if False:
-        # TODO: Apply Production config.
-        current_app != app
-    app.run(host=ip, port=int(port))
 
 if __name__ == '__main__':
     manager.run()

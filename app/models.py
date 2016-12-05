@@ -25,7 +25,7 @@ class PartialConnection(object):
 
 
 class BaseDocument(Document):
-    __database__ = 'store'
+    __database__ = 'heroku_8b9x3jg8'
     __collection__ = 'store'
     use_dot_notation = True
 
