@@ -27,10 +27,6 @@ class Product(BaseDocument):
         ]
     }
 
-    @classmethod
-    def find_by_cat(cls):
-        return cls.find(cls)
-
 
 @db_register
 class Category(BaseDocument):

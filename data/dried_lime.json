@@ -1,6 +1,6 @@
 {
     "name": "Dried lime",
-    "categories": ["Spices"],
+    "categories": ["spices"],
     "cost": 2.99,
     "description": "Sundried fermented Persian limes",
     "stock": 10,

@@ -1,6 +1,6 @@
 {
     "name": "Slivered almonds",
-    "categories": ["Nuts", "Dried Fruit"],
+    "categories": ["nuts", "dried-fruit"],
     "cost": 1.99,
     "description": "100g",
     "stock": 10,

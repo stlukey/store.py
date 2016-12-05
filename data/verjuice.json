@@ -1,6 +1,6 @@
 {
     "name": "Verjuice",
-    "categories": ["Vinegars"],
+    "categories": ["vinegars"],
     "cost": 2.99,
     "description": "400ml bottle of slightly fermented sour grape juice",
     "stock": 10,

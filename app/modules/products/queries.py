@@ -12,13 +12,10 @@ def product_get(product_id):
     return current_app.db.Product.get_from_id(product_id)
 
 
-def product_get_image(product, file_name):
-    with product.fs.get_last_version('images/{}'.format(file_name)) as f:
-            return f.read()
-
-
-def product_find_by_category(category):
+def product_find_by_category_or_abort(category):
     category = current_app.db.Category.find_one({'name': category})
+    if not category:
+        abort(404)
     products = current_app.db.ProductToCategory.find(
         {'category._id': category._id}
     )
@@ -49,6 +46,7 @@ def product_get_or_abort(product_id):
 
 def product_get_image_or_abort(product, file_name):
     try:
-        return product_get_image(product, file_name)
+        with product.fs.get_last_version('images/{}'.format(file_name)) as f:
+            return f.read()
     except gridfs_errors.NoFile:
         abort(404)

@@ -61,6 +61,8 @@ def create_sample():
                 category.save()
             product_to_category = app.db.ProductToCategory()
             product_to_category.product = product
+            print(category)
+            print(category.name)
             product_to_category.category = category
             product_to_category.save()
 

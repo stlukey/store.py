@@ -29,10 +29,14 @@ def view_product(product_id, product_name=None):
                            categories=list(categories))
 
 
+@products.route('/category/<category>')
+@products.route('/all')
 def view(category=None):
     if category:
-        products = queries.product_find_by_category(category)
+            products = queries.product_find_by_category_or_abort(category)
     else:
         products = current_app.db.Product.find()
 
-    return products
+    return render_template('products/view.html',
+                           products=products,
+                           category=category)

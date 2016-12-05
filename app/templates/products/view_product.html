@@ -38,7 +38,7 @@
           <h1>{{ product.name }}</h1>
           <div class="product-desc">{{ product.description }}</div>
           <hr>
-          <div class="product-categories">In: {{ ', '.join(categories) }}</div>
+          <div class="product-categories">{{ category | join(', ') | replace('-', ' ') | title }} </div>
           <hr>
           <div class="product-cost">{{ product.cost }}</div>
           <div class="product-stock">
