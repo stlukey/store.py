@@ -1,9 +1,10 @@
 from urllib.parse import urlparse, urljoin
-from flask import Blueprint, request, render_template, flash, abort, redirect, url_for
+from flask import Blueprint, request, render_template, flash, abort, redirect, url_for, current_app
 from flask_login import login_required, logout_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired
+from passlib.hash import bcrypt
 
 from .user import User
 
@@ -20,12 +21,20 @@ class LoginForm(FlaskForm):
     email = StringField('Email', [DataRequired()])
     password = PasswordField('Password', [DataRequired()])
 
+class RegistraionForm(LoginForm):
+    first_name = StringField('First name', [DataRequired()])
+    last_name = StringField('First name', [DataRequired()])
+
+    contact_num = StringField('Contact number', [DataRequired()])
+
 
 @users.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-    if not form.validate_on_submit():
-        return render_template('users/login.html', title="Login", form=form)
+    login_form = LoginForm()
+    registraion_form = RegistraionForm()
+    if not login_form.validate_on_submit():
+        return render_template('users/login.html', title="Login",
+                               login_form=login_form, registraion_form=registraion_form)
 
     email = request.form['email']
     password = request.form['password']
@@ -56,3 +65,29 @@ def logout():
         return abort(400)
 
     return redirect(next or url_for('store.index'))
+
+@users.route("/register", methods=['POST'])
+def register():
+    form = RegistraionForm()
+
+    if not form.validate_on_submit():
+        flash("Invalid details.", 'danger')
+        return redirect(url_for('users.login'))
+
+    email = request.form['email']
+    if current_app.db.User.find_one({'email': email}):
+        flash('An account for that email address already exists.', 'danger')
+        return redirect(url_for('users.login'))
+
+    user = current_app.db.User()
+    user.email = email
+    user.password = bcrypt.hash(request.form['password'])
+    user.first_name = request.form['first_name']
+    user.last_name = request.form['last_name']
+    user.contact_num = request.form['contact_num']
+    user.save()
+
+    flash('Account Created.', 'success')
+    return redirect(url_for('users.login'))
+
+

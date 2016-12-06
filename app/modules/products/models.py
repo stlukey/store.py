@@ -37,6 +37,12 @@ class Category(BaseDocument):
         'name': str
     }
     required_feilds = ['name']
+    indexes = [
+        {
+            'fields': ['name'],
+            'unique': True
+        }
+    ]
 
 
 @conn.register

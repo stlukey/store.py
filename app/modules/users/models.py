@@ -26,6 +26,12 @@ class User(BaseDocument):
         'first_name',
         'last_name'
     ]
+    indexes = [
+        {
+            'fields': ['email'],
+            'unique': True
+        }
+    ]
 
 
 @conn.register
