@@ -20,8 +20,9 @@ api.representations =  {'application/json': output_json}
 
 api.add_resource(Products, '/products/')
 api.add_resource(Product, '/products/<ObjectID:id>')
-api.add_resource(Categories, '/products/categories/')
-api.add_resource(Category, '/products/categories/<string:name>')
+
+api.add_resource(Categories, '/categories/')
+api.add_resource(Category, '/categories/<string:name>')
 
 
 

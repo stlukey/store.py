@@ -31,7 +31,7 @@ class RegistrationForm(LoginForm):
 @users.route('/login', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm()
-    registration_form = RegistraionForm()
+    registration_form = RegistrationForm()
     if not login_form.validate_on_submit():
         return render_template('users/login.html', title="Login",
                                login_form=login_form, registration_form=registration_form)

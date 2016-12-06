@@ -30,8 +30,8 @@ def view_product(product_id, product_name=None):
                               categories=list(categories))
 
 
-@products.route('/category/<category>')
-@products.route('/all')
+@products.route('/<category>')
+@products.route('/')
 def view(category=None):
     if category:
             products = queries.product_find_by_category_or_abort(category)
