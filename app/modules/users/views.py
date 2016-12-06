@@ -68,7 +68,7 @@ def logout():
 
 @users.route("/register", methods=['POST'])
 def register():
-    form = RegistraionForm()
+    form = RegistrationForm()
 
     if not form.validate_on_submit():
         flash("Invalid details.", 'danger')
