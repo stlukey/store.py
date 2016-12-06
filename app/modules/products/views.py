@@ -2,7 +2,7 @@
 """
 """
 
-from flask import Blueprint, current_app, make_response, render_template
+from flask import Blueprint, current_app, render_template
 
 from . import queries
 
@@ -13,10 +13,7 @@ products = Blueprint('products', __name__)
 @products.route('/<ObjectID:product_id>/images/<file_name>')
 def images(product_id, file_name):
     product = queries.product_get_or_abort(product_id)
-    image = queries.product_get_image_or_abort(product, file_name)
-    response = make_response(image)
-    response.mimetype = 'image/jpeg'
-    return response
+    return queries.product_get_image_or_abort(product, file_name)
 
 
 @products.route('/<ObjectID:product_id>')

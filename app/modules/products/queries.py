@@ -1,7 +1,6 @@
-from flask import current_app, abort, url_for
+from flask import current_app, abort, url_for, send_file
 from bson.objectid import ObjectId
 
-from bson import errors as bson_errors
 from gridfs import errors as gridfs_errors
 
 
@@ -44,7 +43,7 @@ def product_get_or_abort(product_id):
 def product_get_image_or_abort(product, file_name):
     try:
         with product.fs.get_last_version('images/{}'.format(file_name)) as f:
-            return f.read()
+            return send_file(f, mimetype='image/jpeg')
     except gridfs_errors.NoFile:
         abort(404)
 
