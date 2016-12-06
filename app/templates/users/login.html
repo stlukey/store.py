@@ -19,13 +19,13 @@
 
     <h2>Or create an account:</h2>
 
-    {% call macros.render_form(registraion_form, action_url=url_for('users.register'), action_text='Create Account',
+    {% call macros.render_form(registration_form, action_url=url_for('users.register'), action_text='Create Account',
                                         class_='registration-form form-horizontal') %}
-        {{ macros.render_field(registraion_form.email, placeholder='Email', type='email') }}
-        {{ macros.render_field(registraion_form.password, placeholder='Password', type='password') }}
-        {{ macros.render_field(registraion_form.first_name, placeholder='First name', type='text') }}
-        {{ macros.render_field(registraion_form.last_name, placeholder='Last name', type='text') }}
-        {{ macros.render_field(registraion_form.contact_num, placeholder='Contact number', type='tel') }}
+        {{ macros.render_field(registration_form.email, placeholder='Email', type='email') }}
+        {{ macros.render_field(registration_form.password, placeholder='Password', type='password') }}
+        {{ macros.render_field(registration_form.first_name, placeholder='First name', type='text') }}
+        {{ macros.render_field(registration_form.last_name, placeholder='Last name', type='text') }}
+        {{ macros.render_field(registration_form.contact_num, placeholder='Contact number', type='tel') }}
     {% endcall %}
 
 

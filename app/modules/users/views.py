@@ -21,7 +21,7 @@ class LoginForm(FlaskForm):
     email = StringField('Email', [DataRequired()])
     password = PasswordField('Password', [DataRequired()])
 
-class RegistraionForm(LoginForm):
+class RegistrationForm(LoginForm):
     first_name = StringField('First name', [DataRequired()])
     last_name = StringField('First name', [DataRequired()])
 
@@ -31,10 +31,10 @@ class RegistraionForm(LoginForm):
 @users.route('/login', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm()
-    registraion_form = RegistraionForm()
+    registration_form = RegistraionForm()
     if not login_form.validate_on_submit():
         return render_template('users/login.html', title="Login",
-                               login_form=login_form, registraion_form=registraion_form)
+                               login_form=login_form, registration_form=registration_form)
 
     email = request.form['email']
     password = request.form['password']
