@@ -4,6 +4,7 @@ Data management.
 """
 import os
 import json
+from passlib.hash import bcrypt
 
 from . import *
 
@@ -34,13 +35,11 @@ def copy_image(src, dest, length=16 * 1024):
             break
         dest.write(buf)
 
-
-@manager.command
-def create_sample():
-    drop_db()
-    print("Generating new database...")
+def generate_products():
+    print(' '*4 + "Generating products...")
     products = get_products()
     for product_info in products:
+        print(' '*4*2 + "Adding '{}'...".format(product_info['name']))
         product = manager.app.db.Product()
         product.name = product_info['name']
         product.cost = product_info['cost']
@@ -53,6 +52,7 @@ def create_sample():
         for category_name in product_info['categories']:
             category = manager.app.db.Category.one({'name': category_name})
             if category is None:
+                print(' '*4*3 + "Making new category '{}'...".format(category_name))
                 category = manager.app.db.Category()
                 category.name = category_name
                 category.save()
@@ -63,18 +63,40 @@ def create_sample():
 
         with open(product_info['image'], 'rb') as src:
             with product.fs.new_file(
-                'images/thumbnail.jpg'.format(product._id)
+                    'images/thumbnail.jpg'.format(product._id)
             ) as dest:
                 copy_image(src, dest)
 
             with product.fs.new_file(
-                'images/image1.jpg'.format(product._id)
+                    'images/image1.jpg'.format(product._id)
             ) as dest:
                 copy_image(src, dest)
 
-        print("Adding '{}'...".format(product.name))
+        print(' '*4*2 + "Complete!\n")
         product.save()
-    print("Complete!")
+    print(' '*4 + "Complete!\n")
+
+def generate_user():
+    print(' '*4 + "Adding user..")
+    user = manager.app.db.User()
+    user.email= 'user@example.com'
+    user.password = bcrypt.hash('password')
+    user.first_name = 'user'
+    user.last_name = 'name'
+
+    print(' '*4*2 + "Email: " + user.email)
+    print(' '*4*2 + "Password: password")
+
+    print(' '*4 + "Complete!\n")
+    user.save()
+
+@manager.command
+def create_sample():
+    drop_db()
+    print("Generating new database...")
+    generate_products()
+    generate_user()
+    print("Complete!\n")
 
 
 if __name__ == '__main__':

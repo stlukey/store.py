@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% import 'macros.html' as macros %}
+
+{% block head %}
+    <link href="/static/css/heroic-features.css" rel="stylesheet">
+    <link href="/static/css/carousel.css" rel="stylesheet">
+{% endblock head %}
+
+{% block content %}
+
+    <h1>Login</h1>
+
+    {% call macros.render_form(form, action_url=url_for('users.login'), action_text='Login',
+                                        class_='login-form form-horizontal') %}
+        {{ macros.render_field(form.email, placeholder='Email', type='email') }}
+        {{ macros.render_field(form.password, placeholder='Password', type='password') }}
+    {% endcall %}
+
+
+{% endblock content %}

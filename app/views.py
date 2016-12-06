@@ -5,7 +5,7 @@ store = Blueprint('store', __name__)
 
 
 @store.route('/')
-def store_front():
+def index():
     popular = []
     while len(popular) < 4:
         product = current_app.db.Product.find_random()

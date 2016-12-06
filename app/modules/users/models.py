@@ -12,17 +12,19 @@ class User(BaseDocument):
         'first_name': str,
         'last_name': str,
         'contact_num': str,
-        'create_time': datetime
+        'create_time': datetime,
+        'active': bool
     }
     default_values = {
-        'create_time': datetime.now
+        'create_time': datetime.now,
+        #TODO: Add email verification.
+        'active': True,
     }
     required_feilds = [
         'email',
         'password',
         'first_name',
-        'last_name',
-        'contact_num'
+        'last_name'
     ]
 
 
