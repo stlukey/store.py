@@ -50,8 +50,8 @@
                 Categories <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                {% for name, url in global_vars.categories %}
-                    <li><a href="{{ url }}">{{ name }}</a></li>
+                {% for cat in global_vars.categories %}
+                    <li><a href="{{ cat.url }}">{{ cat.name }}</a></li>
                 {% endfor %}
             </ul>
           </li>

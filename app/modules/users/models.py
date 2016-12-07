@@ -1,68 +1,91 @@
-from ...models import BaseDocument, AutorefsDocument, PartialConnection
 from datetime import datetime
+from passlib.hash import bcrypt
 
-conn = PartialConnection()
+from flask_login import login_user
 
-@conn.register
-class User(BaseDocument):
-    __collection__ = 'users'
-    structure = {
-        'email': str,
-        'password': str,
-        'first_name': str,
-        'last_name': str,
-        'contact_num': str,
-        'create_time': datetime,
-        'active': bool
-    }
-    default_values = {
-        'create_time': datetime.now,
-        #TODO: Add email verification.
-        'active': True,
-    }
-    required_feilds = [
-        'email',
+from ...database import db, Document
+
+class User(Document):
+    _collection = db.users
+    _schema =  [
+        '_id', # Email
         'password',
+        'first_name',
+        'last_name',
+        'contact_num',
+        'create_time',
+        'active',
+        {
+            'default_addresses': [
+                'billing',
+                'shipping'
+            ]
+        }
+    ]
+    _check = [
         'first_name',
         'last_name'
     ]
-    indexes = [
-        {
-            'fields': ['email'],
-            'unique': True
+
+    @staticmethod
+    def _format_new(**kwargs):
+        # TODO: Add verification.
+
+        kwargs['password'] = bcrypt.hash(kwargs['password'])
+
+        return {
+            **kwargs,
+            'create_time': datetime.now(),
+            'active': True
         }
-    ]
+
+    @property
+    def is_authenticated(self):
+        return self.exists
+
+    @property
+    def is_active(self):
+        return self.exists and self['active']
+
+    @property
+    def is_anonymous(self):
+        return self.exists
+
+    def get_id(self):
+        return self._id
+
+    @classmethod
+    def login(cls, email, password):
+        user = cls(email)
+        if user.exists:
+            if bcrypt.verify(password, user['password']):
+                login_user(user)
+            else:
+                user = None
+        return user
 
 
-@conn.register
-class Address(AutorefsDocument):
-    __collection__ = 'addresses'
-    structure = {
-        'user': User,
-        'full_name': str,
-        'line1': str,
-        'line2': str,
-        'line3': str,
-        'city': str,
-        'county': str,
-        'postcode': str
-    }
-    required_feilds = {
+class Address(Document):
+    _collection = db.addresses
+    _schema = [
         'user',
+        'full_name',
+        'line1',
+        'line2',
+        'line3',
+        'city',
+        'county',
+        'postcode'
+    ]
+    _check = [
         'full_name',
         'line1',
         'city',
         'county',
         'postcode'
-    }
+    ]
 
+    @staticmethod
+    def _format_new(**kwargs):
+        return kwargs
 
-@conn.register
-class DefaultAddresses(AutorefsDocument):
-    __collection__ = 'default_addresses'
-    structure = {
-        'user': User,
-        'billing': Address,
-        'shipping': Address
-    }
-    required_feilds = structure.keys()

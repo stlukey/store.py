@@ -1,55 +1,128 @@
-
-from ...models import PartialConnection, BaseDocument, AutorefsDocument
+from flask import url_for
 from datetime import datetime
+from gridfs import GridFS
 
-conn = PartialConnection()
+from ...database import db, Document, ValidationError
+from ...utils import copy_image
 
+class Product(Document):
+    _collection = db.products
+    _schema = [
+        'description',
+        'datetime',
+        'cost',
+        'stock',
+        'name',
+        'recipes', # ['name', 'url']
+        'thumbnail'
+    ]
+    _check = _schema[:-1]
 
-@conn.register
-class Product(BaseDocument):
-    __collection__ = 'products'
-    structure = {
-        'name': str,
-        'cost': float,
-        'date_added': datetime,
-        'description': str,
-        'stock': int,
-        'recipes': [{
-            'name': str,
-            'url': str
-        }]
-    }
-    default_feilds = {
-        'date_added': datetime.now
-    }
-    required_feilds = structure.keys()
-    gridfs = {
-        'containers': [
-            'images'
-        ]
-    }
-
-
-@conn.register
-class Category(BaseDocument):
-    __collection__ = 'categories'
-    structure = {
-        'name': str
-    }
-    required_feilds = ['name']
-    indexes = [
-        {
-            'fields': ['name'],
-            'unique': True
+    @staticmethod
+    def _format_new(**kwargs):
+        return {
+            **kwargs,
+            'datetime': datetime.now()
         }
+
+    @property
+    def categories(self):
+        p2cs = ProductToCategory.find(product=self._id)
+        for p2c in p2cs:
+            yield Category(p2c['category'])
+
+    @property
+    def thumbnail(self):
+        fs = GridFS(db)
+        return fs.get(self['thumbnail'])
+
+    @thumbnail.setter
+    def thumbnail(self, image):
+        fs = GridFS(db)
+        image_id = fs.put(image)
+        self._doc['thumbnail'] = image_id
+        self._update()
+
+
+class Category(Document):
+    _collection = db.categories
+    _schema = [
+        # '_id'
     ]
 
+    @staticmethod
+    def _format_new(**kwargs):
+        name = kwargs['name']
+        for char in name:
+            if not char.isalnum() and char != ' ':
+                raise ValidationError(
+                    "Invalid character in category name: {}"
+                        .format(char)
+                )
 
-@conn.register
-class ProductToCategory(AutorefsDocument):
-    __collection__ = 'products_to_categories'
-    structure = {
-        'product': Product,
-        'category': Category
-    }
-    required_feilds = structure.keys()
+        _id = name.lower().replace(' ', '-')
+        cat = Category(_id)
+        if cat.exists:
+            raise ValidationError(
+                "Category name too similar to existing category: {}"
+                    .format(cat.name)
+            )
+
+        return {'_id': _id}
+
+    @classmethod
+    def find_by_name(cls, name):
+        _id = name.lower().replace(' ', '-')
+        return cls(_id)
+
+    @property
+    def name(self):
+        return self._doc._id.replace('-', '-').title()
+
+    @property
+    def products(self):
+        p2cs = ProductToCategory.find(category=self._id)
+
+        for p2c in p2cs:
+            yield Product(p2c['product'])
+
+    @property
+    def url(self):
+        return url_for('products.view', category=self._id)
+
+class ProductToCategory(Document):
+    _collection = db.products_to_categories
+    _schema = [
+        'product',
+        'category'
+    ]
+
+    @staticmethod
+    def _format_new(**kwargs):
+        product = kwargs['product']
+        category = kwargs['category']
+
+        return {
+            'product': product._id,
+            'category': category._id
+        }
+
+
+class Review(Document):
+    _collection = db.reviews
+    _schema = [
+        'user',
+        'rating',
+        'description',
+        'datetime'
+    ]
+    _check = [
+        'rating',
+        'description'
+    ]
+
+    @staticmethod
+    def _format_new(**kwargs):
+        kwargs['user'] = User(kwargs['user'])
+        kwargs['datetime'] = datetime.now()
+        return kwargs

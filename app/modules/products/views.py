@@ -2,38 +2,35 @@
 """
 """
 
-from flask import Blueprint, current_app, render_template
+from flask import Blueprint, render_template, send_file
 
-from . import queries
+from .models import *
 
 products = Blueprint('products', __name__)
 
-
-
-@products.route('/<ObjectID:product_id>/images/<file_name>')
-def images(product_id, file_name):
-    product = queries.product_get_or_abort(product_id)
-    return queries.product_get_image_or_abort(product, file_name)
-
+@products.route('/<ObjectID:product_id>/images/thumbnail.jpg')
+def thumbnail(product_id):
+    product = Product(product_id)
+    return send_file(product.thumbnail)
 
 @products.route('/<ObjectID:product_id>')
 @products.route('/<ObjectID:product_id>/<product_name>')
 def view_product(product_id, product_name=None):
-    product = queries.product_get_or_abort(product_id)
-    categories = queries.product_find_categories(product)
+    product = Product(product_id)
+    categories = product.categories
 
     return render_template('products/view_product.html',
                               product=product,
                               categories=list(categories))
 
 
-@products.route('/<category>')
+@products.route('/<string:category>')
 @products.route('/')
 def view(category=None):
     if category:
-            products = queries.product_find_by_category_or_abort(category)
+            products = Category(category).products
     else:
-        products = current_app.db.Product.find()
+        products = Product.find()
 
     return render_template('products/view.html',
                               products=products,

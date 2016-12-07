@@ -6,7 +6,7 @@ from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired
 from passlib.hash import bcrypt
 
-from .user import User
+from .models import User
 
 users = Blueprint('users', __name__)
 
@@ -75,19 +75,23 @@ def register():
         return redirect(url_for('users.login'))
 
     email = request.form['email']
-    if current_app.db.User.find_one({'email': email}):
+    if User(email).exists:
         flash('An account for that email address already exists.', 'danger')
         return redirect(url_for('users.login'))
 
-    user = current_app.db.User()
-    user.email = email
-    user.password = bcrypt.hash(request.form['password'])
-    user.first_name = request.form['first_name']
-    user.last_name = request.form['last_name']
-    user.contact_num = request.form['contact_num']
-    user.save()
+    user = User.new(
+        email=email,
+        password=request.form['password'],
+        first_name=request.form['first_name'],
+        last_name=request.form['last_name'],
+        contact_num=request.form['contact_num'],
+    )
 
-    flash('Account Created.', 'success')
+    if user.exists:
+        flash('Account Created.', 'success')
+    else:
+        flash('An error occurred.', 'danger')
+
     return redirect(url_for('users.login'))
 
 
