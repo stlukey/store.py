@@ -3,7 +3,6 @@ from datetime import datetime
 from gridfs import GridFS
 
 from ...database import db, Document, ValidationError
-from ...utils import copy_image
 
 class Product(Document):
     _collection = db.products
