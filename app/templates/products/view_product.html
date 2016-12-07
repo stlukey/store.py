@@ -38,7 +38,14 @@
           <h1>{{ product.name }}</h1>
           <div class="product-desc">{{ product.description }}</div>
           <hr>
-          <div class="product-categories">{{ category | join(', ') | replace('-', ' ') | title }} </div>
+          <div class="product-categories">
+          Categories:
+          {% for i in range(product.categories | length) %}
+              {% set cat = product.categories[i] %}
+              <a href="{{ cat.url }}">{{ cat.name }}</a>
+              {% if i != product.categories | length - 1%},{% endif %}
+          {% endfor %}
+          </div>
           <hr>
           <div class="product-cost">{{ product.cost }}</div>
           <div class="product-stock">

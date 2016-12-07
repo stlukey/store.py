@@ -26,9 +26,8 @@ class Product(Document):
 
     @property
     def categories(self):
-        p2cs = ProductToCategory.find(product=self._id)
-        for p2c in p2cs:
-            yield Category(p2c['category'])
+        return [Category(p2c['category'])
+                for p2c in ProductToCategory.find(product=self._id)]
 
     @property
     def thumbnail(self):
@@ -76,7 +75,7 @@ class Category(Document):
 
     @property
     def name(self):
-        return self._doc._id.replace('-', '-').title()
+        return self._id.replace('-', '-').title()
 
     @property
     def products(self):

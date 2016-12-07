@@ -22,6 +22,7 @@ class GlobalTemplateVars(object):
     #TODO: Fix.
     categories = list(Category.find())
 
+print(GlobalTemplateVars.categories)
 
 app = Flask(__name__)
 app.config.update(

@@ -17,18 +17,17 @@ def thumbnail(product_id):
 @products.route('/<ObjectID:product_id>/<product_name>')
 def view_product(product_id, product_name=None):
     product = Product(product_id)
-    categories = product.categories
 
     return render_template('products/view_product.html',
-                              product=product,
-                              categories=list(categories))
+                              product=product)
 
 
 @products.route('/<string:category>')
 @products.route('/')
 def view(category=None):
     if category:
-            products = Category(category).products
+            category = Category(category)
+            products = category.products
     else:
         products = Product.find()
 

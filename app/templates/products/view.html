@@ -8,7 +8,7 @@
 <div class="container">
 <h1> Products 
 {% if category %}
--> {{ category | replace('-', ' ') | title }}
+-> {{ category.name }}
 {% endif %}
 </h1>
  <div class="row">

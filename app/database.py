@@ -108,8 +108,7 @@ class Document(object):
         if _sort:
             docs = docs.sort(*_sort)
 
-        for doc in docs:
-            yield cls(doc['_id'])
+        return [cls(doc['_id']) for doc in docs]
 
     def __getitem__(self, item):
         return self._doc[item]
