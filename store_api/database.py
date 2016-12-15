@@ -6,16 +6,16 @@ Minimal ORM for Mongodb
 """
 
 
-from pymongo import Connection
+from pymongo import MongoClient
 import os
 
-conn = Connection(os.environ.get('MONGODB_URI', 'localhost'))
-db = conn[os.environ.get('MONGODB_NAME', 'online-store')]
+client = MongoClient(os.environ.get('MONGODB_URI', 'localhost'))
+db = client[os.environ.get('MONGODB_NAME', 'online-store')]
 
 class ValidationError(Exception):
     @classmethod
     def not_provided(cls, key):
-        raise cls("'{}' not provided.".format(key))
+        return cls("'{}' not provided.".format(key))
 
 
 def make_spec(schema, **kwargs):
@@ -66,7 +66,7 @@ class Document(object):
 
     @classmethod
     def new(cls, **kwargs):
-        """
+        """ 
         Insert new document.
 
         :param kwargs: values
@@ -114,15 +114,23 @@ class Document(object):
         return self._doc[item]
 
     @property
-    def _id(self):
+    def id(self):
         return self._doc['_id']
 
-    def _update(self):
-        return self._collection.update(
-            {'_id': self._id},
-            {'$set': self._doc}
+    def update(self, set_=None):
+        if set_ is None:
+            set_ = self._doc
+        res = self._collection.update(
+            {'_id': self.id},
+            {'$set': set_}
         )
+        self._doc = self.__class__(self.id)._doc
+        return res
 
     @property
-    def exists(self):
+    def exists(self) :
         return self._doc is not None
+
+    def __iter__(self):
+        for k, v in self._doc.items():
+            yield k, v

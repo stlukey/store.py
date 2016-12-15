@@ -6,28 +6,13 @@ import os
 import json
 
 
-from app.database import conn, db
-from app.modules.products.models import Product, ProductToCategory, Category
-from app.modules.users.models import User
+from ..database import client
+from ..resources.products.models import Product, ProductToCategory, Category
+from ..resources.users.models import User
 
-from flask_script import Manager
-from app import app
-
-manager = Manager(app)
-
-manager.add_option('-c', '--config', dest='config', required=False)
-
-@manager.command
-def run():
-    return manager.app.run(host=manager.app.config.get('HOST', 'localhost'),
-                           port=manager.app.config.get('PORT', 5000))
-
-
-
-@manager.command
 def drop_db():
     print("Dropping database ...")
-    conn.drop_database(os.environ.get('MONGODB_NAME', 'online-store'))
+    client.drop_database(os.environ.get('MONGODB_NAME', 'online-store'))
 
 
 def get_products():
@@ -41,9 +26,6 @@ def get_products():
         products.append(product)
 
     return products
-
-
-
 
 def generate_products():
     print(' '*4 + "Generating products...")
@@ -86,12 +68,12 @@ def generate_user():
         last_name = 'name'
     )
 
-    print(' '*4*2 + "Email: " + user['_id'])
+    print(' '*4*2 + "Email: " + user.id)
     print(' '*4*2 + "Password: password")
 
     print(' '*4 + "Complete!\n")
 
-@manager.command
+
 def create_sample():
     drop_db()
     print("Generating new database...")
@@ -101,4 +83,4 @@ def create_sample():
 
 
 if __name__ == '__main__':
-    manager.run()
+    create_sample()

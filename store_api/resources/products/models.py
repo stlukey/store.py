@@ -13,7 +13,7 @@ class Product(Document):
         'stock',
         'name',
         'recipes', # ['name', 'url']
-        'thumbnail'
+        'images'
     ]
     _check = _schema[:-1]
 
@@ -21,26 +21,45 @@ class Product(Document):
     def _format_new(**kwargs):
         return {
             **kwargs,
+            'images': {},
             'datetime': datetime.now()
         }
 
     @property
     def categories(self):
         return [Category(p2c['category'])
-                for p2c in ProductToCategory.find(product=self._id)]
+                for p2c in ProductToCategory.find(product=self.id)]
+
+    def get_image(self, image_name):
+        fs = GridFS(db)
+        return fs.get(self['images'][image_name])
 
     @property
     def thumbnail(self):
-        fs = GridFS(db)
-        return fs.get(self['thumbnail'])
+        return self.get_image('thumbnail')
 
     @thumbnail.setter
     def thumbnail(self, image):
         fs = GridFS(db)
         image_id = fs.put(image)
-        self._doc['thumbnail'] = image_id
-        self._update()
+        self._doc['images']['thumbnail'] = image_id
+        self.update()
 
+    @property
+    def url_name(self):
+        """
+        URL Safe name
+        """
+        return '-'.join(self['name'].lower().split())
+
+    def __iter__(self):
+        changes = {
+            'images': lambda imgs: map(lambda s:s+'.jpg', imgs.keys())
+        }
+        for k, v in super(Product, self).__iter__():
+            if k in changes:
+                v = changes[k](v)
+            yield k, v
 
 class Category(Document):
     _collection = db.categories
@@ -75,18 +94,18 @@ class Category(Document):
 
     @property
     def name(self):
-        return self._id.replace('-', '-').title()
+        return self.id.replace('-', '-').title()
 
     @property
     def products(self):
-        p2cs = ProductToCategory.find(category=self._id)
+        p2cs = ProductToCategory.find(category=self.id)
 
         for p2c in p2cs:
             yield Product(p2c['product'])
 
     @property
     def url(self):
-        return url_for('products.view', category=self._id)
+        return url_for('products.view', category=self.id)
 
 class ProductToCategory(Document):
     _collection = db.products_to_categories
@@ -101,8 +120,8 @@ class ProductToCategory(Document):
         category = kwargs['category']
 
         return {
-            'product': product._id,
-            'category': category._id
+            'product': product.id,
+            'category': category.id
         }
 
 
