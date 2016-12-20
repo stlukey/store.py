@@ -56,7 +56,7 @@ class Category(Resource):
 
 class Categories(Resource):
     def get(self):
-        return [cat.id for cat in models.Category.find()]
+        return {cat.id:cat.name for cat in models.Category.find()}
 
 
 def register_resources(api):

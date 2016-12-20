@@ -57,15 +57,15 @@ class Product(Document):
             'images': lambda imgs: [url_for('productimage', id=self.id, name=img) for img in imgs.keys()],
         }
 
-        yield 'categories', [
-            [cat.id for cat in self.categories],
-            [cat.name for cat in self.categories]
-        ]
+        yield 'categories', {
+            cat.id: cat.name for cat in self.categories
+        } 
 
         for k, v in super(Product, self).__iter__():
             if k in changes:
                 v = changes[k](v)
             yield k, v
+
 
 class Category(Document):
     _collection = db.categories
@@ -100,7 +100,7 @@ class Category(Document):
 
     @property
     def name(self):
-        return self.id.replace('-', '-').title()
+        return self.id.replace('-', ' ').title()
 
     @property
     def products(self):
@@ -112,6 +112,7 @@ class Category(Document):
     @property
     def url(self):
         return url_for('products.view', category=self.id)
+
 
 class ProductToCategory(Document):
     _collection = db.products_to_categories
