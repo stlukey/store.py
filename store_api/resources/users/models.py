@@ -1,11 +1,29 @@
+import os
 from datetime import datetime
 from passlib.hash import bcrypt
-
-from flask_httpauth import HTTPBasicAuth
+from itsdangerous import (TimedJSONWebSignatureSerializer
+                          as Serializer, BadSignature, SignatureExpired)
+from functools import wraps
+from flask import request
 
 from ...database import db, Document
 
-auth = HTTPBasicAuth()
+
+def requires_token(func):
+    @wraps(func)
+    def check_token(*args, **kwargs):
+        token = request.cookies.get('token')
+        if not token:
+            return "Access denied; no token", 401
+
+        user = User.verify_auth_token(token)
+        if not user.exists:
+            return "Token expired", 419
+
+        return func(user, *args, **kwargs)
+
+    return check_token
+
 
 class User(Document):
     _collection = db.users
@@ -43,6 +61,9 @@ class User(Document):
             'active': True
         }
 
+    def check_password(self, password):
+        return bcrypt.verify(password, self['password'])
+
     @classmethod
     def login(cls, email, password):
         user = cls(email)
@@ -50,9 +71,27 @@ class User(Document):
             return True
         return False
 
-    def add_to_cart(item, amount=None):
+    def generate_auth_token(self, expiration=60 * 60):
+        s = Serializer(os.environ['FLASK_SECRET'], expires_in=expiration)
+        return s.dumps({'id': self.id})
+
+    @classmethod
+    def verify_auth_token(cls, token):
+        s = Serializer(os.environ['FLASK_SECRET'])
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            # valid token, but expired
+            return None
+        except BadSignature:
+            # invalid token
+            return None
+        user = cls(data['id'])
+        return user
+
+    def add_to_cart(self, item, amount=None):
         if amount is not None:
-            self['cart'][item] = amount -1
+            self['cart'][item] = amount - 1
 
         if item not in self['cart']:
             self['cart'][item] = 0
@@ -78,10 +117,6 @@ class User(Document):
                 yield k, v
 
 
-
-
-auth.verify_password(lambda email, pwd: User.login(email, pwd))
-
 class Address(Document):
     _collection = db.addresses
     _schema = [
@@ -105,4 +140,3 @@ class Address(Document):
     @staticmethod
     def _format_new(**kwargs):
         return kwargs
-

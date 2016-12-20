@@ -29,6 +29,23 @@ class Products(Resource):
         return models.Product.find()
 
 
+class ProductsLatest(Resource):
+    def get(self):
+        return [
+            product for product in
+                models.Product.find(_sort=("datetime", 1))
+        ][:3]
+
+
+class ProductsPopular(Resource):
+    def get(self):
+        return [
+            product for product in models.Product.find()
+                if 'popular' in [product.id for product in
+                                    product.categories]
+        ]
+
+
 class Category(Resource):
     def get(self, id):
         category = models.Category(id)
@@ -44,6 +61,9 @@ class Categories(Resource):
 
 def register_resources(api):
     api.add_resource(Products, '/products/')
+    api.add_resource(ProductsLatest, '/products/latest')
+    api.add_resource(ProductsPopular, '/products/popular')
+
     api.add_resource(Product, '/products/<ObjectID:id>')
     api.add_resource(ProductImage, '/products/<ObjectID:id>/<string:name>.jpg')
 

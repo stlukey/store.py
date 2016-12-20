@@ -10,11 +10,7 @@ from . import cart
 
 
 def output_json(obj, code, headers=None):
-    output = {
-        "data": obj,
-        "status": code
-    }
-    resp = make_response(dumps(output), code)
+    resp = make_response(dumps(obj), code)
     resp.headers.extend(headers or {})
     return resp
 

@@ -54,8 +54,14 @@ class Product(Document):
 
     def __iter__(self):
         changes = {
-            'images': lambda imgs: map(lambda s:s+'.jpg', imgs.keys())
+            'images': lambda imgs: [url_for('productimage', id=self.id, name=img) for img in imgs.keys()],
         }
+
+        yield 'categories', [
+            [cat.id for cat in self.categories],
+            [cat.name for cat in self.categories]
+        ]
+
         for k, v in super(Product, self).__iter__():
             if k in changes:
                 v = changes[k](v)
