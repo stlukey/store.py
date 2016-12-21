@@ -22,14 +22,17 @@ app.config.update(
 app.url_map.converters['ObjectID'] = ObjectIDConverter
 register_resources(app)
 
+
 @app.after_request
 def apply_caching(response):
     response.headers["Access-Control-Allow-Origin"] = os.environ['JS_ORIGIN']
+    response.headers["Access-Control-Allow-Credentials"] = 'true'
     return response
+
 
 def main():
     app.run()
 
+
 if __name__ == '__main__':
     main()
-
