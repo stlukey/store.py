@@ -21,9 +21,6 @@ class Cart(Resource):
 class CartItem(Resource):
     decorators = Cart.decorators + [pass_product]
 
-    def get(self, user, product):
-        return user['cart'].get(str(product.id), 0)
-
     def post(self, user, product):
         cart = user['cart']
         amount = cart.get(str(product.id), 0) + 1
@@ -33,7 +30,7 @@ class CartItem(Resource):
         if not res['nModified']:
             return "SERVER ERROR; not modified.", 500
 
-        return cart.get(str(product.id), 0)
+        return cart
 
     def put(self, user, product):
         ALLOWED = ['amount']
@@ -50,18 +47,18 @@ class CartItem(Resource):
         if not res['nModified']:
             return "SERVER ERROR; not modified.", 500
 
-        return cart.get(str(product.id), 0)
+        return cart
 
     def delete(self, user, product):
         cart = user['cart']
-        if product.id in cart:
+        if str(product.id) in cart:
             del cart[str(product.id)]
 
         res = user.update({'cart': cart})
         if not res['nModified']:
             return "SERVER ERROR; not modified.", 500
 
-        return cart.get(str(product.id), 0)
+        return cart
 
 
 def register_resources(api):
