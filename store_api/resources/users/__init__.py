@@ -22,14 +22,22 @@ class Users(Resource):
             'contact_number'
         ]
         data = request.get_json(force=True)
+        for k in data:
+            if k not in REQUIRED:
+                return "BAD REQUEST; '{}' is invalid".format(
+                    k), 400
 
-        if REQUIRED.keys() != data.keys():
-            return "BAD REQUEST; provided values should be: {}".format(
-                REQUIRED.keys()), 400
+
+        for k in REQUIRED:
+            if k not in data:
+                return "BAD REQUEST; required value '{}' missing".format(
+                    k), 400
+
+
         if User(data['_id']).exists:
             return "Conflict; email already exists.", 409
 
-        user = User.new(*data)
+        user = User.new(**data)
         return user
 
     def put(self, user):

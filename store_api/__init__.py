@@ -28,6 +28,7 @@ def apply_caching(response):
     response.headers["Access-Control-Allow-Origin"] = os.environ['JS_ORIGIN']
     response.headers["Access-Control-Allow-Credentials"] = 'true'
     response.headers["Access-Control-Allow-Methods"] = 'GET, POST, PUT, DELETE'
+    response.headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept"
     return response
 
 
