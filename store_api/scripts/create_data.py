@@ -9,6 +9,8 @@ import json
 from ..database import client
 from ..resources.products.models import Product, ProductToCategory, Category
 from ..resources.users.models import User
+from ..resources.pages.models import Page
+
 
 def drop_db():
     print("Dropping database ...")
@@ -27,11 +29,23 @@ def get_products():
 
     return products
 
+
+def generate_pages():
+    print(' ' * 4 + "Generating pages...")
+
+    print(' ' * 4 * 2 + "Adding contact page...")
+    Page.new(_id='contact', content='<h1>Contact</h1>')
+    print(' ' * 4 * 2 + "Adding about page...")
+    Page.new(_id='about', content='<h1>About</h1>')
+
+    print(' ' * 4 + "Complete!\n")
+
+
 def generate_products():
-    print(' '*4 + "Generating products...")
+    print(' ' * 4 + "Generating products...")
     products = get_products()
     for product_info in products:
-        print(' '*4*2 + "Adding '{}'...".format(product_info['name']))
+        print(' ' * 4 * 2 + "Adding '{}'...".format(product_info['name']))
         product = Product.new(
             name=product_info['name'],
             cost=product_info['cost'],
@@ -43,7 +57,9 @@ def generate_products():
         for category_name in product_info['categories']:
             category = Category.find_by_name(category_name)
             if not category.exists:
-                print(' '*4*3 + "Making new category '{}'...".format(category_name))
+                print(
+                    ' ' * 4 * 3 +
+                    "Making new category '{}'...".format(category_name))
                 category = Category.new(
                     name=category_name
                 )
@@ -55,29 +71,31 @@ def generate_products():
         with open(product_info['image'], 'rb') as src:
             product.thumbnail = src.read()
 
-        print(' '*4*2 + "Complete!\n")
+        print(' ' * 4 * 2 + "Complete!\n")
 
-    print(' '*4 + "Complete!\n")
+    print(' ' * 4 + "Complete!\n")
+
 
 def generate_user():
-    print(' '*4 + "Adding user..")
+    print(' ' * 4 + "Adding user..")
     user = User.new(
-        _id= 'user@example.com',
-        password = 'password',
-        first_name = 'user',
-        last_name = 'name'
+        _id='user@example.com',
+        password='password',
+        first_name='user',
+        last_name='name'
     )
 
-    print(' '*4*2 + "Email: " + user.id)
-    print(' '*4*2 + "Password: password")
+    print(' ' * 4 * 2 + "Email: " + user.id)
+    print(' ' * 4 * 2 + "Password: password")
 
-    print(' '*4 + "Complete!\n")
+    print(' ' * 4 + "Complete!\n")
 
 
 def create_sample():
     drop_db()
     print("Generating new database...")
     generate_products()
+    generate_pages()
     generate_user()
     print("Complete!\n")
 

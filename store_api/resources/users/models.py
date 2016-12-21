@@ -4,7 +4,7 @@ from passlib.hash import bcrypt
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 from functools import wraps
-from flask import request
+from flask import request, make_response
 
 from ...database import db, Document
 
@@ -17,8 +17,11 @@ def requires_token(func):
             return "Access denied; no token", 401
 
         user = User.verify_auth_token(token)
-        if not user.exists:
-            return "Token expired", 419
+        if not user or not user.exists:
+            response = make_response("Token expired")
+            response.status_code = 419
+            response.set_cookie('token', '', expires=0)
+            return response
 
         return func(user, *args, **kwargs)
 
