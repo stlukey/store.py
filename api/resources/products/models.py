@@ -13,7 +13,8 @@ class Product(Document):
         'stock',
         'name',
         'recipes', # ['name', 'url']
-        'images'
+        'images',
+        'active'
     ]
     _check = _schema[:-1]
 
@@ -21,8 +22,9 @@ class Product(Document):
     def _format_new(**kwargs):
         return {
             **kwargs,
-            'images': {},
-            'datetime': datetime.now()
+            'images': [],
+            'datetime': datetime.now(),
+            'active': True
         }
 
     @property
@@ -30,19 +32,25 @@ class Product(Document):
         return [Category(p2c['category'])
                 for p2c in ProductToCategory.find(product=self.id)]
 
-    def get_image(self, image_name):
+    def get_image(self, image_index):
         fs = GridFS(db)
-        return fs.get(self['images'][image_name])
+        return fs.get(self['images'][int(image_index)])
 
     @property
     def thumbnail(self):
-        return self.get_image('thumbnail')
+        return self.get_image(0)
 
     @thumbnail.setter
     def thumbnail(self, image):
         fs = GridFS(db)
         image_id = fs.put(image)
-        self._doc['images']['thumbnail'] = image_id
+        self._doc['images'].insert(0, image_id)
+        self.update()
+
+    def add_image(self, image):
+        fs = GridFS(db)
+        image_id = fs.put(image)
+        self._doc['images'].append(image_id)
         self.update()
 
     @property
@@ -54,12 +62,17 @@ class Product(Document):
 
     def __iter__(self):
         changes = {
-            'images': lambda imgs: [url_for('productimage', id=self.id, name=img) for img in imgs.keys()],
+            'images': lambda imgs: [
+                url_for('productimage', id=self.id, image_index=img)
+                    for img in range(len(imgs)
+                        # If item has no images a placeholder will
+                        # be provided on request.
+                        if len(imgs) else 1)],
         }
 
         yield 'categories', {
             cat.id: cat.name for cat in self.categories
-        } 
+        }
 
         for k, v in super(Product, self).__iter__():
             if k in changes:

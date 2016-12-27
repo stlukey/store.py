@@ -1,4 +1,4 @@
-from flask import send_file
+from flask import send_file, redirect
 from ...utils import Resource
 from . import models
 
@@ -18,15 +18,17 @@ class Product(Resource):
 
 
 class ProductImage(Product):
-    def get(self, product, name):
-        if name not in product['images'].keys():
-            return 'NOT FOUND', 404
-        return send_file(product.get_image(name))
+    def get(self, product, image_index):
+        print(image_index, range(len(product['images'])), product['images'])
+        if image_index not in range(len(product['images'])):
+            return redirect('https://placehold.it/410x308')
+            #return 'NOT FOUND', 404
+        return send_file(product.get_image(image_index))
 
 
 class Products(Resource):
     def get(self):
-        return models.Product.find()
+        return models.Product.find(active=True)
 
 
 class ProductsLatest(Resource):
@@ -65,7 +67,7 @@ def register_resources(api):
     api.add_resource(ProductsPopular, '/products/popular')
 
     api.add_resource(Product, '/products/<ObjectID:id>')
-    api.add_resource(ProductImage, '/products/<ObjectID:id>/<string:name>.jpg')
+    api.add_resource(ProductImage, '/products/<ObjectID:id>/<int:image_index>.jpg')
 
     api.add_resource(Categories, '/categories/')
     api.add_resource(Category, '/categories/<string:id>')

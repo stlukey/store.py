@@ -42,8 +42,6 @@ END
     echo "Error launching mongodb."
     exit 1
 }
-alias is_mongodb_up='mongo --eval "db.stats()" >/dev/null'
-
 
 main() {
     cd $DIR
@@ -52,7 +50,7 @@ main() {
     set_env_vars
     [ $production -eq 0 ] && launch_mongodb
 
-    target='store_api'
+    target='api'
     [[ $@ != '' ]] && target="$target.scripts.$@"
     python -m $target
 

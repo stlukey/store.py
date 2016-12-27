@@ -5,10 +5,10 @@ Main application.
 
 import os
 
-from flask import Flask
-from flask_httpauth import HTTPBasicAuth
+from flask import Flask, Blueprint, url_for
 
 from .resources import register_resources
+from .admin_resources import register_resources as register_admin_resources
 from .utils import ObjectIDConverter
 
 
@@ -18,10 +18,18 @@ app.config.update(
     TESTING=bool(int(os.environ['FLASK_TESTING'])),
     SECRET_KEY=os.environ['FLASK_SECRET']
 )
-
 app.url_map.converters['ObjectID'] = ObjectIDConverter
-register_resources(app)
 
+admin = Blueprint('api', __name__, url_prefix='/admin')
+
+register_resources(app)
+register_admin_resources(admin)
+
+app.register_blueprint(admin)
+
+@app.route('/')
+def root():
+    return url_for('api.productsadmin')
 
 @app.after_request
 def apply_caching(response):

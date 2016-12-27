@@ -1,15 +1,13 @@
 from flask import request, make_response
-from ...utils import Resource
+from ...utils import Resource, check_data
 from .models import *
-
 
 
 class Users(Resource):
     _decorators = {
         'get': [requires_token],
         'post': [],
-        'put': [requires_token],
- #       'delete': [requires_token]
+        'put': [requires_token]
     }
 
     def get(self, user):
@@ -22,17 +20,9 @@ class Users(Resource):
             'contact_number'
         ]
         data = request.get_json(force=True)
-        for k in data:
-            if k not in REQUIRED:
-                return "BAD REQUEST; '{}' is invalid".format(
-                    k), 400
-
-
-        for k in REQUIRED:
-            if k not in data:
-                return "BAD REQUEST; required value '{}' missing".format(
-                    k), 400
-
+        allowed, resp = check_data(data, REQUIRED, True)
+        if not allowed:
+            return resp
 
         if User(data['_id']).exists:
             return "Conflict; email already exists.", 409
@@ -46,9 +36,9 @@ class Users(Resource):
             'last_name', 'contact_number'
         ]
         data = request.get_json(force=True)
-        for k in data.keys():
-            if k not in ALLOWED:
-                return "BAD REQUEST; '{}' not allowed.".format(key), 400
+        allowed, resp = check_data(data, ALLOWED)
+        if not allowed:
+            return resp
 
         if 'password' in data.keys():
             data['password'] = bcrypt.hash(data['password'])
@@ -59,22 +49,19 @@ class Users(Resource):
 
         return user
 
-#    def delete(self, user):
-#        pass
-
 
 class UserToken(Resource):
     def post(self, email):
         user = User(email)
         if not user.exists:
-            return "Authentification Error; no user", 401
+            return "Authentication Error; no user", 401
 
         data = request.get_json(force=True)
         password = data.get('password')
         if password:
             password = user.check_password(password)
         if not password:
-            return "Authentification Error; no pass", 401
+            return "Authentication Error; no pass", 401
 
         token = user.generate_auth_token()
 
