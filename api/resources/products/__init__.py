@@ -24,10 +24,11 @@ class Product(Resource):
 
 class ProductImage(Resource):
     def get(self, id):
-        image = models.get_image(id)
-        if not image:
+        if id == 'placeholder':
             return redirect('https://placehold.it/410x308')
-
+        
+        id = ObjectId(id)
+        image = models.get_image(id)
         return send_file(image)
 
 
@@ -40,7 +41,7 @@ class ProductsLatest(Resource):
     def get(self):
         return [
             product for product in
-                models.Product.find(active=True, _sort=("datetime", 1))
+                models.Product.find(active=True, _sort=("datetime", -1))
         ][:3]
 
 
@@ -74,7 +75,7 @@ def register_resources(api):
     api.add_resource(ProductsPopular, '/products/popular')
 
     api.add_resource(Product, '/products/<ObjectID:id>')
-    api.add_resource(ProductImage, '/images/<ObjectID:id>.jpg')
+    api.add_resource(ProductImage, '/images/<id>.jpg')
 
     api.add_resource(Categories, '/categories/')
     api.add_resource(Category, '/categories/<string:id>')

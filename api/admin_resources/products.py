@@ -16,7 +16,7 @@ class ProductsAdmin(Products):
 
     def post(self):
         REQUIRED = [
-            'desciption',
+            'description',
             'cost', 'name'
         ]
         data = request.get_json(force=True)
@@ -30,7 +30,7 @@ class ProductsAdmin(Products):
         data['stock'] = 0
         data['active'] = False
 
-        product = models.product.new(**data)
+        product = models.Product.new(**data)
         return product
 
 

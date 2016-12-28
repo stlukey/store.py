@@ -105,7 +105,7 @@ class Product(Document):
                     for img in (imgs
                         # If item has no images a placeholder will
                         # be provided on request.
-                        if len(imgs) else 'placeholder')],
+                        if len(imgs) else ['placeholder'])],
         }
 
         yield 'categories', {
