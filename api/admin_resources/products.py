@@ -1,13 +1,13 @@
 from flask import request
 
-from ..utils import check_data
-from ..resources.products import Products, Product, ProductImage, Categories
+from ..utils import check_data, Resource
+from ..resources.products import (Products, Product, ProductImage,
+                                  Categories, pass_product)
 from ..resources.products import models
 
 
 def valid_file(image):
-    # TODO: add file format check.
-    return True
+    return image.content_type == 'image/jpeg'
 
 
 class ProductsAdmin(Products):
@@ -84,8 +84,10 @@ class ProductAdmin(Product):
         return product
 
 
-class ProductImageAdmin(ProductImage):
-    def post(self, product):
+class ProductImageAdmin(Resource):
+    decorators = [pass_product]
+
+    def post(self, product, image_index):
         for file in request.files:
             if not valid_file(file):
                 return 400
@@ -101,11 +103,10 @@ class ProductImageAdmin(ProductImage):
         if not valid_file(file):
             return 400
 
+        file = file.stream.read()
         if image_index == len(product['images']):
-            product.add_image(file)
-        else:
-            product._doc['images'][image_index] = file
-            product.update()
+            image_index = None
+        product.add_image(file, image_index)
 
         return product
 
@@ -123,6 +124,6 @@ def register_resources(admin_api):
 
     admin_api.add_resource(ProductAdmin, '/products/<ObjectID:id>')
     admin_api.add_resource(
-        ProductImage,
-        '/products/<ObjectID:id>/<int:image_index>.jpg'
+        ProductImageAdmin,
+        '/products/<ObjectID:id>/<int:image_index>'
     )

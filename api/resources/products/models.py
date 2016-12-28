@@ -4,6 +4,24 @@ from gridfs import GridFS
 
 from ...database import db, Document, ValidationError
 
+from ..users.models import User
+
+
+def upload_image(image):
+    fs = GridFS(db)
+    return fs.put(image)
+
+
+def delete_image(image_id):
+    fs = GridFS(db)
+    return fs.delete(image_id)
+
+
+def get_image(image_id):
+    fs = GridFS(db)
+    return fs.get(image_id)
+
+
 class Product(Document):
     _collection = db.products
     _schema = [
@@ -50,26 +68,27 @@ class Product(Document):
                 ProductToCategory.new(product=self,
                                       category=cat)
 
-
-    def get_image(self, image_index):
-        fs = GridFS(db)
-        return fs.get(self['images'][int(image_index)])
-
     @property
     def thumbnail(self):
-        return self.get_image(0)
+        return Product.get_image(self['images'][0])
 
     @thumbnail.setter
     def thumbnail(self, image):
-        fs = GridFS(db)
-        image_id = fs.put(image)
-        self._doc['images'].insert(0, image_id)
-        self.update()
+        self.add_image(image, 0)
 
-    def add_image(self, image):
-        fs = GridFS(db)
-        image_id = fs.put(image)
-        self._doc['images'].append(image_id)
+    def add_image(self, image, index=None):
+        IMAGE_COUNT = len(self._doc['images'])
+
+        image_id = upload_image(image)
+        if index is None or (index not in range(IMAGE_COUNT)):
+            if index is None:
+                index = IMAGE_COUNT
+            self._doc['images'].insert(index, image_id)
+
+        else:
+            delete_image(self._doc['images'][index])
+            self._doc['images'][index] = image_id
+
         self.update()
 
     @property
@@ -82,11 +101,11 @@ class Product(Document):
     def __iter__(self):
         changes = {
             'images': lambda imgs: [
-                url_for('productimage', id=self.id, image_index=img)
-                    for img in range(len(imgs)
+                url_for('productimage', id=img)
+                    for img in (imgs
                         # If item has no images a placeholder will
                         # be provided on request.
-                        if len(imgs) else 1)],
+                        if len(imgs) else 'placeholder')],
         }
 
         yield 'categories', {
@@ -113,7 +132,7 @@ class Category(Document):
                 if not char.isalpha() and char != ' ':
                     raise ValidationError(
                         "Invalid character in category name: {}"
-                            .format(char)
+                        .format(char)
                     )
             _id = name.lower().replace(' ', '-')
 
@@ -123,15 +142,14 @@ class Category(Document):
                 if not char.islower() and char != '-':
                     raise ValidationError(
                         "Invalid character in category _id: {}"
-                            .format(char)
+                        .format(char)
                     )
 
-            
         cat = Category(_id)
         if cat.exists:
             raise ValidationError(
                 "Category name too similar to existing category: {}"
-                    .format(cat.name)
+                .format(cat.name)
             )
 
         return {'_id': _id}

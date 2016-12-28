@@ -1,6 +1,8 @@
 from flask import send_file, redirect
 from ...utils import Resource
 from . import models
+from bson.objectid import ObjectId
+
 
 def pass_product(func):
     def wrapped(id, *args, **kwargs):
@@ -20,14 +22,13 @@ class Product(Resource):
         return product
 
 
-class ProductImage(Product):
-    def get(self, product, image_index):
-        print(image_index, range(len(product['images'])), product['images'])
-        if image_index not in range(len(product['images'])):
-            if not range(len(product['images'])):
-                return redirect('https://placehold.it/410x308')
-            image_index = 0
-        return send_file(product.get_image(image_index))
+class ProductImage(Resource):
+    def get(self, id):
+        image = models.get_image(id)
+        if not image:
+            return redirect('https://placehold.it/410x308')
+
+        return send_file(image)
 
 
 class Products(Resource):
@@ -73,7 +74,7 @@ def register_resources(api):
     api.add_resource(ProductsPopular, '/products/popular')
 
     api.add_resource(Product, '/products/<ObjectID:id>')
-    api.add_resource(ProductImage, '/products/<ObjectID:id>/<int:image_index>.jpg')
+    api.add_resource(ProductImage, '/images/<ObjectID:id>.jpg')
 
     api.add_resource(Categories, '/categories/')
     api.add_resource(Category, '/categories/<string:id>')
