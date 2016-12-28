@@ -17,12 +17,7 @@ class ProductsAdmin(Products):
     def post(self):
         REQUIRED = [
             'desciption',
-            'cost', 'name',
-            'recipes', 'category_ids',
-            'active'
-        ]
-        RECIPES_REQUIRED = [
-            'name', 'url'
+            'cost', 'name'
         ]
         data = request.get_json(force=True)
 
@@ -31,18 +26,11 @@ class ProductsAdmin(Products):
         if not allowed:
             return resp
 
-        # Check recipe data.
-        allowed, resp = check_data(data['recipes'],
-                                   RECIPES_REQUIRED, True)
-        if not allowed:
-            return resp
-
-        if 'category_ids' in data:
-            category_ids = data['category_ids']
-            del data['category_ids']
+        data['recipes'] = []
+        data['stock'] = 0
+        data['active'] = False
 
         product = models.product.new(**data)
-        product.categories = category_ids
         return product
 
 
@@ -54,9 +42,11 @@ class ProductAdmin(Product):
         ALLOWED = [
             'description', 'cost',
             'name', 'recipes', 'category_ids',
-            'active'
+            'active', 'stock',
+
+            '$inc'
         ]
-        RECIPES_REQUIRED = [
+        RECIPE_REQUIRED = [
             'name', 'url'
         ]
         data = request.get_json(force=True)
@@ -67,17 +57,28 @@ class ProductAdmin(Product):
 
         # Check recipe data.
         if 'recipes' in data and len(data['recipes']):
-            allowed, resp = check_data(data['recipes'],
-                                       RECIPES_REQUIRED, True)
-        if not allowed:
-            return resp
+            for recipe in data['recipes']:
+                allowed, resp = check_data(recipe,
+                                           RECIPE_REQUIRED, True)
+                if not allowed:
+                    return resp
 
         if 'category_ids' in data:
             product.categories = data['category_ids']
             del data['category_ids']
 
+        if 'stock' in data:
+            data['stock'] = int(data['stock'])
+
+        kwargs = {}
+        if '$inc' in data and data['$inc']:
+            del data['$inc']
+            kwargs['_inc'] = data
+        else:
+            kwargs['_set'] = data
+
         if data:
-            res = product.update(data)
+            res = product.update(**kwargs)
             if not res['nModified']:
                 return "SEVER ERROR; not modified.", 500
 

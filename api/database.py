@@ -117,12 +117,19 @@ class Document(object):
     def id(self):
         return self._doc['_id']
 
-    def update(self, set_=None):
-        if set_ is None:
-            set_ = self._doc
+    def update(self, _set=None, _inc=None):
+        if _set is None and _inc is None:
+            _set = self._doc
+
+        update = {}
+        if _set is not None:
+            update['$set'] = _set
+        if _inc is not None:
+            update['$inc'] = _inc
+
         res = self._collection.update(
             {'_id': self.id},
-            {'$set': set_}
+            update
         )
         self._doc = self.__class__(self.id)._doc
         return res
