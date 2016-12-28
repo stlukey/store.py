@@ -6,6 +6,7 @@ Main application.
 import os
 
 from flask import Flask, Blueprint, url_for
+import appenlight_client.ext.flask as appenlight
 
 from .resources import register_resources
 from .admin_resources import register_resources as register_admin_resources
@@ -19,6 +20,10 @@ app.config.update(
     SECRET_KEY=os.environ['FLASK_SECRET']
 )
 app.url_map.converters['ObjectID'] = ObjectIDConverter
+
+if os.environ['APPENLIGHT_API_KEY']:
+    app = appenlight.add_appenlight(app, 
+        {'appenlight.api_key':os.environ['APPENLIGHT_API_KEY']})
 
 admin = Blueprint('api', __name__, url_prefix='/admin')
 
