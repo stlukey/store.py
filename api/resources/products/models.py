@@ -12,7 +12,7 @@ class Product(Document):
         'cost',
         'stock',
         'name',
-        'recipes', # ['name', 'url']
+        'recipes',  # ['name', 'url']
         'images',
         'active'
     ]
@@ -31,6 +31,25 @@ class Product(Document):
     def categories(self):
         return [Category(p2c['category'])
                 for p2c in ProductToCategory.find(product=self.id)]
+
+    @categories.setter
+    def categories(self, category_ids):
+        current = ProductToCategory.find(product=self.id)
+        for p2c in current:
+            if p2c['category'] not in category_ids:
+                p2c.delete()
+
+        print(current, category_ids)
+        for category in category_ids:
+            print(category)
+            if category not in current:
+                cat = Category(category)
+                if not cat.exists:
+                    cat = Category.new(category)
+
+                ProductToCategory.new(product=self,
+                                      category=cat)
+
 
     def get_image(self, image_index):
         fs = GridFS(db)
@@ -88,15 +107,26 @@ class Category(Document):
 
     @staticmethod
     def _format_new(**kwargs):
-        name = kwargs['name']
-        for char in name:
-            if not char.isalnum() and char != ' ':
-                raise ValidationError(
-                    "Invalid character in category name: {}"
-                        .format(char)
-                )
+        if 'name' in kwargs:
+            name = kwargs['name']
+            for char in name:
+                if not char.isalpha() and char != ' ':
+                    raise ValidationError(
+                        "Invalid character in category name: {}"
+                            .format(char)
+                    )
+            _id = name.lower().replace(' ', '-')
 
-        _id = name.lower().replace(' ', '-')
+        else:
+            _id = kwargs['_id']
+            for char in name:
+                if not char.islower() and char != '-':
+                    raise ValidationError(
+                        "Invalid character in category _id: {}"
+                            .format(char)
+                    )
+
+            
         cat = Category(_id)
         if cat.exists:
             raise ValidationError(

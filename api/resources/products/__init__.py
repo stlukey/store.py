@@ -11,9 +11,12 @@ def pass_product(func):
         return func(product, *args, **kwargs)
     return wrapped
 
+
 class Product(Resource):
     decorators = [pass_product]
     def get(self, product):
+        if not product['active']:
+            return "NOT FOUND", 404
         return product
 
 
@@ -21,8 +24,9 @@ class ProductImage(Product):
     def get(self, product, image_index):
         print(image_index, range(len(product['images'])), product['images'])
         if image_index not in range(len(product['images'])):
-            return redirect('https://placehold.it/410x308')
-            #return 'NOT FOUND', 404
+            if not range(len(product['images'])):
+                return redirect('https://placehold.it/410x308')
+            image_index = 0
         return send_file(product.get_image(image_index))
 
 
@@ -35,14 +39,14 @@ class ProductsLatest(Resource):
     def get(self):
         return [
             product for product in
-                models.Product.find(_sort=("datetime", 1))
+                models.Product.find(active=True, _sort=("datetime", 1))
         ][:3]
 
 
 class ProductsPopular(Resource):
     def get(self):
         return [
-            product for product in models.Product.find()
+            product for product in models.Product.find(active=True)
                 if 'popular' in [product.id for product in
                                     product.categories]
         ]
@@ -58,7 +62,9 @@ class Category(Resource):
 
 class Categories(Resource):
     def get(self):
-        return {cat.id:cat.name for cat in models.Category.find()}
+        return {cat.id:cat.name for cat in models.Category.find()
+                # Only display categiories which have products.
+                if len(models.ProductToCategory.find(category=cat.id))}
 
 
 def register_resources(api):

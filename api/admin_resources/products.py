@@ -1,20 +1,25 @@
 from flask import request
 
 from ..utils import check_data
-from ..resources.products import Products, Product, ProductImage
+from ..resources.products import Products, Product, ProductImage, Categories
 from ..resources.products import models
 
 
 def valid_file(image):
+    # TODO: add file format check.
     return True
 
 
 class ProductsAdmin(Products):
+    def get(self):
+        return models.Product.find()
+
     def post(self):
         REQUIRED = [
             'desciption',
             'cost', 'name',
-            'recipes'
+            'recipes', 'category_ids',
+            'active'
         ]
         RECIPES_REQUIRED = [
             'name', 'url'
@@ -32,15 +37,24 @@ class ProductsAdmin(Products):
         if not allowed:
             return resp
 
-        user = models.product.new(**data)
-        return user
+        if 'category_ids' in data:
+            category_ids = data['category_ids']
+            del data['category_ids']
+
+        product = models.product.new(**data)
+        product.categories = category_ids
+        return product
 
 
 class ProductAdmin(Product):
+    def get(self, product):
+        return product
+
     def put(self, product):
         ALLOWED = [
-            'desciption', 'cost',
-            'name', 'recipes'
+            'description', 'cost',
+            'name', 'recipes', 'category_ids',
+            'active'
         ]
         RECIPES_REQUIRED = [
             'name', 'url'
@@ -58,9 +72,15 @@ class ProductAdmin(Product):
         if not allowed:
             return resp
 
-        res = product.update(data)
-        if not res['nModified']:
-            return "SEVER ERROR; not modified.", 500
+        if 'category_ids' in data:
+            product.categories = data['category_ids']
+            del data['category_ids']
+
+        if data:
+            res = product.update(data)
+            if not res['nModified']:
+                return "SEVER ERROR; not modified.", 500
+
         return product
 
 
@@ -71,20 +91,23 @@ class ProductImageAdmin(ProductImage):
                 return 400
             product.add_image(file)
 
-        return product['images']
+        return product
 
     def put(self, product, image_index):
-        if image_index >= len(product['images']):
+        if image_index > len(product['images']):
             return "NOT FOUND; image does not exist", 404
 
         file = request.files['file']
-        if not valid_file(400):
+        if not valid_file(file):
             return 400
 
-        product._doc['images'][image_index] = file
-        product.update()
+        if image_index == len(product['images']):
+            product.add_image(file)
+        else:
+            product._doc['images'][image_index] = file
+            product.update()
 
-        return product['images']
+        return product
 
     def delete(self, product, image_index):
         if image_index >= len(product['images']):
@@ -96,8 +119,9 @@ class ProductImageAdmin(ProductImage):
 
 def register_resources(admin_api):
     admin_api.add_resource(ProductsAdmin, '/products')
+    admin_api.add_resource(Categories, '/categories')
 
-    admin_api.add_resource(Product, '/products/<ObjectID:id>')
+    admin_api.add_resource(ProductAdmin, '/products/<ObjectID:id>')
     admin_api.add_resource(
         ProductImage,
         '/products/<ObjectID:id>/<int:image_index>.jpg'

@@ -41,7 +41,7 @@ def apply_caching(response):
 
 
 def main():
-    app.run()
+    app.run(threaded=True) 
 
 
 if __name__ == '__main__':

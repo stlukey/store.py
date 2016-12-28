@@ -128,8 +128,12 @@ class Document(object):
         return res
 
     @property
-    def exists(self) :
+    def exists(self):
         return self._doc is not None
+
+    def delete(self):
+        self._collection.delete_one({'_id': self.id})
+        self._doc = None
 
     def __iter__(self):
         for k, v in self._doc.items():
