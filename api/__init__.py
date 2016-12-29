@@ -32,10 +32,6 @@ register_admin_resources(admin)
 
 app.register_blueprint(admin)
 
-@app.route('/')
-def root():
-    return url_for('api.productsadmin')
-
 @app.after_request
 def apply_caching(response):
     response.headers["Access-Control-Allow-Origin"] = os.environ['JS_ORIGIN']

@@ -31,7 +31,7 @@ def requires_token(func):
 class User(Document):
     _collection = db.users
     _schema =  [
-        '_id', # Email
+        # '_id', # Email
         'password',
         'first_name',
         'last_name',
@@ -47,6 +47,7 @@ class User(Document):
         }
     ]
     _check = [
+        '_id',
         'first_name',
         'last_name'
     ]
