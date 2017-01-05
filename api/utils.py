@@ -1,11 +1,15 @@
 """
 Utils
 """
+import os
 from flask import request
 from flask_restful import Resource
 from werkzeug.routing import BaseConverter, ValidationError
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
+
+import easypost
+easypost.api_key = os.environ['EASYPOST_API_KEY']
 
 from .database import Document
 

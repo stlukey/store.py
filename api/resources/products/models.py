@@ -32,7 +32,9 @@ class Product(Document):
         'name',
         'recipes',  # ['name', 'url']
         'images',
-        'active'
+        'active',
+
+        'parcel_id'
     ]
     _check = _schema[:-1]
 
@@ -42,7 +44,7 @@ class Product(Document):
             **kwargs,
             'images': [],
             'datetime': datetime.now(),
-            'active': True
+            'active': False
         }
 
     @property
