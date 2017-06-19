@@ -17,5 +17,11 @@
             "name": "Persian Meatless Herby “Meatballs” (koofteh sabzi)",
             "url": "http://www.thepersianfusion.com/meatless-herby-persian-style-meatballs-kufteh-sabzi/"
         }
-    ]
+    ],
+    "measurements": {
+        "width": 10,
+        "depth": 10,
+        "length": 10,
+        "weight": 1
+    }
 }

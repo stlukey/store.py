@@ -29,7 +29,7 @@ class ProductsAdmin(Products):
         data['recipes'] = []
         data['stock'] = 0
         data['active'] = False
-        data['parcel_id'] = None
+        # data['parcel_id'] = None
 
         product = models.Product.new(**data)
         return product

@@ -5,8 +5,10 @@ from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 from functools import wraps
 from flask import request, make_response
+from bson.objectid import ObjectId
 
 from ...database import db, Document
+from ..products.models import Product
 
 
 def requires_token(func):
@@ -119,6 +121,20 @@ class User(Document):
         for k, v in super(User, self).__iter__():
             if k not in EXCLUDE:
                 yield k, v
+
+    @property
+    def cart_sums(self):
+        cart = self['cart']
+        measurements = []
+        sub_total = 0
+
+        for item, quantity in cart.items():
+            item = Product(ObjectId(item))
+            for _ in range(quantity):
+                measurements.append(item._doc['measurements'])
+            sub_total += item._doc['cost'] * quantity
+
+        return sub_total, measurements
 
 
 class Address(Document):

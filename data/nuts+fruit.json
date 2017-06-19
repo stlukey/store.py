@@ -13,5 +13,11 @@
             "name": "Persian-Style Jewelled Butternut Squash Rice",
             "url": "http://www.thepersianfusion.com/persian-style-jewelled-butternut-squash-rice/"
         }
-    ]
+    ],
+    "measurements": {
+        "width": 10,
+        "depth": 10,
+        "length": 10,
+        "weight": 1
+    }
 }

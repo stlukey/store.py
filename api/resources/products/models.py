@@ -4,7 +4,10 @@ from gridfs import GridFS
 
 from ...database import db, Document, ValidationError
 
-from ..users.models import User
+
+def user_import():
+    from ..users.models import User
+    global User
 
 
 def upload_image(image):
@@ -34,7 +37,14 @@ class Product(Document):
         'images',
         'active',
 
-        'parcel_id'
+        {
+            'measurements': [
+                'width',
+                'depth',
+                'length',
+                'weight'
+            ]
+        }
     ]
     _check = _schema[:-1]
 
@@ -193,6 +203,9 @@ class ProductToCategory(Document):
             'product': product.id,
             'category': category.id
         }
+
+
+user_import()
 
 
 class Review(Document):

@@ -9,5 +9,11 @@
             "name": "Meatball Stuffed Aubergine Bundles in Verjuice Sauce",
             "url": "http://www.thepersianfusion.com/meatball-stuffed-aubergine-bundles-in-verjuice-sauce/"
         }
-    ]
+    ],
+    "measurements": {
+        "width": 10,
+        "depth": 10,
+        "length": 10,
+        "weight": 1
+    }
 }

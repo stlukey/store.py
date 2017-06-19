@@ -51,7 +51,8 @@ def generate_products():
             cost=product_info['cost'],
             description=product_info['description'],
             stock=product_info['stock'],
-            recipes=product_info['links']
+            recipes=product_info['links'],
+            measurements=product_info['measurements']
         )
 
         for category_name in product_info['categories']:
@@ -70,6 +71,8 @@ def generate_products():
 
         with open(product_info['image'], 'rb') as src:
             product.thumbnail = src.read()
+
+        product.update(dict(active=True))
 
         print(' ' * 4 * 2 + "Complete!\n")
 

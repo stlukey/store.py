@@ -17,5 +17,12 @@
             "name": "Healthy Persian-Style Saffron Chicken",
             "url": "http://www.thepersianfusion.com/healthy-persian-style-saffron-chicken/"
         }
-    ]
+    ],
+    "measurements": {
+        "width": 10,
+        "depth": 10,
+        "length": 10,
+        "weight": 1
+    }
 }
+
