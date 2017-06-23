@@ -141,7 +141,7 @@ class Address(Document):
     _collection = db.addresses
     _schema = [
         'user',
-        'full_name',
+        'name',
         'line1',
         'line2',
         'line3',
@@ -150,7 +150,7 @@ class Address(Document):
         'postcode'
     ]
     _check = [
-        'full_name',
+        'name',
         'line1',
         'city',
         'county',
