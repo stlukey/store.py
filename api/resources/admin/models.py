@@ -1,17 +1,16 @@
 
 from datetime import datetime
 
-from ...models import BaseDocument, PartialConnection
+from ...database import Document, db
 
-conn = PartialConnection()
+class Shipment(Document):
+    _collection = db.shipments
+    _schema = [
+        'datetime',
+        'dispatch_datetime'
+    ]
 
-@conn.register
-class Shipment(BaseDocument):
-    __collections__ = 'shipments'
-    structure = {
-        'create_time': datetime,
-        'dispatch_time': datetime
-    }
-    default_values = {
-        'create_time': datetime.now
-    }
+    @staticmethod
+    def _format_new(*kwargs):
+        kwargs['datetime'] = datetime.now()
+        return kwargs

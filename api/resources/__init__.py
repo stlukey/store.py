@@ -7,6 +7,7 @@ from . import products
 from . import users
 from . import cart
 from . import pages
+from . import orders
 
 
 def output_json(obj, code, headers=None):
@@ -25,3 +26,4 @@ def register_resources(app):
     users.register_resources(api)
     cart.register_resources(api)
     pages.register_resources(api)
+    orders.register_resources(api)

@@ -11,6 +11,9 @@ from bson.errors import InvalidId
 import easypost
 easypost.api_key = os.environ['EASYPOST_API_KEY']
 
+import stripe
+stripe.api_key = os.environ['STRIPE_KEY']
+
 from .database import Document
 
 
@@ -74,7 +77,7 @@ def check_data(data, allowed=[], required=False):
             return False, (BAD_REQUEST.format(k), BAD_REQUEST_CODE)
 
     if required:
-        for k in allowed:
+        for k in required:
             if k not in data:
                 return False, (BAD_REQUEST_REQUIRED.format(k),
                                BAD_REQUEST_CODE)

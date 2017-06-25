@@ -5,7 +5,6 @@ from ...utils import Resource
 from ..users.models import *
 from ..products import pass_product
 from ..products.models import Product
-from .package import package
 
 
 class Cart(Resource):
@@ -68,15 +67,10 @@ class CartCost(Resource):
     decorators = Cart.decorators
 
     def get(self, user):
-        sub_total, measurements = user.cart_sums
-
-        sizes = package(measurements)
-        shipping_costs = [s.cost for s in sizes]
-
+        sub_total, shipping = user.cart_sums
         return {
             'sub_total': sub_total,
-            'shipping': [sum(c) for c in zip(*shipping_costs)],
-            'measurements': measurements
+            'shipping': shipping
         }
 
 

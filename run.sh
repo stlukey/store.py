@@ -65,4 +65,3 @@ done
 shift $((OPTIND-1))
 
 main "$@"
-

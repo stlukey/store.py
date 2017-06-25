@@ -19,10 +19,11 @@ app.config.update(
     TESTING=bool(int(os.environ['FLASK_TESTING'])),
     SECRET_KEY=os.environ['FLASK_SECRET']
 )
+
 app.url_map.converters['ObjectID'] = ObjectIDConverter
 
 if os.environ['APPENLIGHT_API_KEY']:
-    app = appenlight.add_appenlight(app, 
+    app = appenlight.add_appenlight(app,
         {'appenlight.api_key':os.environ['APPENLIGHT_API_KEY']})
 
 admin = Blueprint('api', __name__, url_prefix='/admin')
@@ -42,7 +43,7 @@ def apply_caching(response):
 
 
 def main():
-    app.run(threaded=True) 
+    app.run(threaded=True)
 
 
 if __name__ == '__main__':

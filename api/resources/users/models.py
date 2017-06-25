@@ -9,6 +9,7 @@ from bson.objectid import ObjectId
 
 from ...database import db, Document
 from ..products.models import Product
+from .package import package
 
 
 def requires_token(func):
@@ -41,12 +42,7 @@ class User(Document):
         'create_time',
         'active',
         'cart', # {'product': 'amount'}
-        {
-            'default_addresses': [
-                'billing',
-                'shipping'
-            ]
-        }
+        'default_address'
     ]
     _check = [
         '_id',
@@ -104,6 +100,11 @@ class User(Document):
 
         self['cart'][item] += 1
 
+    def empty_cart(self):
+        for item in list(self['cart']):
+            del self['cart'][item]
+        self.update()
+
     def update(self, set_=None, *args, **kwargs):
         format_cart = lambda cart: {
             str(item):amount for item, amount in cart.items()
@@ -134,7 +135,10 @@ class User(Document):
                 measurements.append(item._doc['measurements'])
             sub_total += item._doc['cost'] * quantity
 
-        return sub_total, measurements
+        sizes = package(measurements)
+        shipping_costs = [s.cost for s in sizes]
+
+        return sub_total, [sum(c) for c in zip(*shipping_costs)]
 
 
 class Address(Document):
