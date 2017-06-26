@@ -35,7 +35,7 @@ class Orders(Resource):
 
         # Compute Total
         sub_total, shipping = user.cart_sums
-        shipping = shipping[data['shipping_method']]
+        shipping = shipping[int(data['shipping_method'])]
         total = int(round(sub_total + shipping, 2) * 100)
 
         # Process payment
@@ -63,6 +63,7 @@ class Orders(Resource):
             },
             'shipping': {
                 'address': {
+                    'name': data['name'],
                     'line1': data['line1'],
                     'line2': data.get('line2'),
                     'line3': data.get('line3'),
