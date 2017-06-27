@@ -20,7 +20,7 @@ class Users(Resource):
             'contact_number'
         ]
         data = request.get_json(force=True)
-        allowed, resp = check_data(data, REQUIRED, True)
+        allowed, resp = check_data(data, REQUIRED, REQUIRED)
         if not allowed:
             return resp
 
@@ -57,11 +57,11 @@ class UserToken(Resource):
             return "Authentication Error; no user", 401
 
         data = request.get_json(force=True)
-        #password = data.get('password')
-        #if password:
-        #    password = user.check_password(password)
-        #if not password:
-        #    return "Authentication Error; no pass", 401
+        password = data.get('password')
+        if password:
+            password = user.check_password(password)
+        if not password:
+            return "Authentication Error; no pass", 401
 
         token = user.generate_auth_token()
 
