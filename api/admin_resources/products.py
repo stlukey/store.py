@@ -22,7 +22,7 @@ class ProductsAdmin(Products):
         data = request.get_json(force=True)
 
         # Check product data.
-        allowed, resp = check_data(data, REQUIRED, True)
+        allowed, resp = check_data(data, REQUIRED, REQUIRED)
         if not allowed:
             return resp
 
@@ -60,7 +60,7 @@ class ProductAdmin(Product):
         if 'recipes' in data and len(data['recipes']):
             for recipe in data['recipes']:
                 allowed, resp = check_data(recipe,
-                                           RECIPE_REQUIRED, True)
+                                           RECIPE_REQUIRED, RECIPE_REQUIRED)
                 if not allowed:
                     return resp
 
