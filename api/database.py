@@ -110,6 +110,12 @@ class Document(object):
 
         return [cls(doc['_id']) for doc in docs]
 
+    @classmethod
+    def find_one(cls, **kwargs):
+        spec = cls.spec(**kwargs)
+        doc = cls._collection.find_one(spec)
+        return cls(doc)
+
     def __getitem__(self, item):
         return self._doc[item]
 

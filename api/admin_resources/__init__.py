@@ -6,7 +6,7 @@ from bson.json_util import dumps
 from . import products
 from . import users
 from . import orders
-#from . import cart
+from . import shipments
 from . import pages
 from . import parcel
 
@@ -26,6 +26,6 @@ def register_resources(admin):
     products.register_resources(admin_api)
     users.register_resources(admin_api)
     orders.register_resources(admin_api)
-    #cart.register_resources(admin_api)
+    shipments.register_resources(admin_api)
     pages.register_resources(admin_api)
     parcel.register_resources(admin_api)

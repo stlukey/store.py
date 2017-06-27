@@ -11,6 +11,6 @@ class Shipment(Document):
     ]
 
     @staticmethod
-    def _format_new(*kwargs):
+    def _format_new(**kwargs):
         kwargs['datetime'] = datetime.now()
         return kwargs
