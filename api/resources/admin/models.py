@@ -14,3 +14,7 @@ class Shipment(Document):
     def _format_new(**kwargs):
         kwargs['datetime'] = datetime.now()
         return kwargs
+
+    @classmethod
+    def get_current(cls):
+    	return cls(dispatch_datetime={'$exists': False})

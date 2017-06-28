@@ -13,17 +13,20 @@ class Shipments(Resource):
         """
         Put all pending orders in shipment.
         """
-        current = models.Shipment(dispatch_datetime={'$exists': False})
+        current = models.Shipment.get_current()
         if current.exists:
             return "BAD REQUEST; Shipment pending.", 400
         
+
+        orders_pending = Order._collection.find({'shipping.shipment': {'$exists': False}})
+        orders_pending = [Order(order['_id']) for order in orders_pending]
+        if len(orders_pending) == 0:
+            return "BAD REQUEST; No orders awaiting shipment.", 400
+
         current = models.Shipment.new()
 
-        orders_pending = Order.find({'shipping': {'shipment': {'$exists': False}}})
         for order in orders_pending:
-            shipping = order['shipping']
-            shipping['shipment'] = current.id
-            order.update(_set={'shipping': shipping})
+            order.update({'shipping.shipment': current.id})
 
         return current
 
@@ -31,7 +34,7 @@ class Shipments(Resource):
         """
         Mark shipment as shipped.
         """
-        current = models.Shipment(dispatch_datetime={'$exists': False})
+        current = models.Shipment.get_current()
         if not current.exists:
             return "BAD REQUEST; No shipment pending.", 400
 
@@ -44,11 +47,21 @@ class Shipment(Resource):
         if not shipment.exists:
             return "NOT FOUND", 404
 
-        orders = Order.find({'shipping': {'shipment': shipment.id}})
+        orders = Order._collection.find({'shipping.shipment': shipment.id})
 
         return dict(orders=orders, **dict(shipment))
+
+#class CurrentShipment(Resource):
+#    def get(self):
+#        current = models.Shipment.get_current()
+#        if not current.exists:
+#            return "NOT FOUND", 404
+#        orders = Order.find({'shipping': {'shipment': current.id}})
+#
+#        return dict(orders=orders, **dict(current))
 
 
 def register_resources(admin_api):
     admin_api.add_resource(Shipments, '/shipments')
+    #admin_api.add_resource(CurrentShipment, '/shipments/current')
     admin_api.add_resource(Shipment, '/shipments/<ObjectID:_id>')

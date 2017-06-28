@@ -4,6 +4,7 @@ from .models import Order as OrderModel
 
 from ...utils import Resource, check_data, stripe
 from ..users.models import requires_token
+from ..admin.models import Shipment
 
 
 class Orders(Resource):
@@ -93,8 +94,18 @@ class Order(Resource):
         if not order.can_view(user):
             return "FORBIDDEN", 403
 
-        return order
+        status = "pending"
+        if ('shipment' in order._doc['shipping'] and
+            order._doc['shipping']['shipment'] is not None):
+            status = "processing"
 
+            shipment = Shipment(order._doc['shipping']['shipment'])
+
+            if ('dispatch_datetime' in shipment._doc and
+                shipment._doc['dispatch_datetime'] is not None):
+                status = "dispatched"
+
+        return dict(status=status, **dict(order))
 
 def register_resources(api):
     api.add_resource(Orders, '/orders')
