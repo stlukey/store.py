@@ -44,8 +44,8 @@ class Users(Resource):
             data['password'] = bcrypt.hash(data['password'])
 
         res = user.update(data)
-        if not res['nModified']:
-            return "SEVER ERROR; not modified.", 500
+        #if not res['nModified']:
+        #    return "SEVER ERROR; not modified.", 500
 
         return user
 
