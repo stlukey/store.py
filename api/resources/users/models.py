@@ -30,6 +30,21 @@ def requires_token(func):
 
     return check_token
 
+def requires_admin():
+    token = request.cookies.get('token')
+    if not token:
+        return "Access denied; no token", 401
+
+    user = User.verify_auth_token(token)
+    if not user or not user.exists:
+        response = make_response("Token expired")
+        response.status_code = 419
+        response.set_cookie('token', '', expires=0)
+        return response
+
+    if not user.admin:
+        return "Access denied; not admin", 401
+
 
 class User(Document):
     _collection = db.users
@@ -42,7 +57,8 @@ class User(Document):
         'create_time',
         'active',
         'cart', # {'product': 'amount'}
-        'default_address'
+        'admin',
+        'default_address',
     ]
     _check = [
         '_id',
@@ -56,6 +72,9 @@ class User(Document):
 
         kwargs['password'] = bcrypt.hash(kwargs['password'])
         kwargs['cart'] = {}
+
+        if 'admin' not in kwargs:
+            kwargs['admin'] = False
 
         return {
             **kwargs,
@@ -139,6 +158,10 @@ class User(Document):
         shipping_costs = [s.cost for s in sizes]
 
         return sub_total, [sum(c) for c in zip(*shipping_costs)]
+
+    @property
+    def admin(self):
+        return self._doc['admin']
 
 
 class Address(Document):

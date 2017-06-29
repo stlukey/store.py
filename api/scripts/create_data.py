@@ -85,7 +85,23 @@ def generate_user():
         _id='user@example.com',
         password='password',
         first_name='user',
-        last_name='name'
+        last_name='name',
+        admin=False
+    )
+
+    print(' ' * 4 * 2 + "Email: " + user.id)
+    print(' ' * 4 * 2 + "Password: password")
+
+    print(' ' * 4 + "Complete!\n")
+
+def generate_admin():
+    print(' ' * 4 + "Adding admin..")
+    user = User.new(
+        _id='admin@example.com',
+        password='password',
+        first_name='admin',
+        last_name='',
+        admin=True
     )
 
     print(' ' * 4 * 2 + "Email: " + user.id)
@@ -100,6 +116,7 @@ def create_sample():
     generate_products()
     generate_pages()
     generate_user()
+    generate_admin()
     print("Complete!\n")
 
 

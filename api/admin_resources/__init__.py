@@ -3,12 +3,14 @@ from flask_restful import Api
 from flask import make_response
 from bson.json_util import dumps
 
+from ..resources.users.models import requires_admin
+
 from . import products
 from . import users
 from . import orders
 from . import shipments
 from . import pages
-from . import parcel
+
 
 
 def output_json(obj, code, headers=None):
@@ -18,6 +20,8 @@ def output_json(obj, code, headers=None):
 
 
 def register_resources(admin):
+    admin.before_request(requires_admin)
+
     admin_api = Api(admin)
     admin_api.representations = {
         'application/json': output_json
@@ -28,4 +32,3 @@ def register_resources(admin):
     orders.register_resources(admin_api)
     shipments.register_resources(admin_api)
     pages.register_resources(admin_api)
-    parcel.register_resources(admin_api)
