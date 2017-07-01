@@ -12,6 +12,6 @@ MAIL_USE_SSL = bool(int(os.environ.get('MAIL_USE_SSL')))
 MAIL_USERNAME = os.environ.get('MAILGUN_SMTP_LOGIN')
 MAIL_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD')
 
-SERVER_EMAIL = "no-reply@maryamsingredients.mailgun.com"
+SERVER_EMAIL = "no-reply@appe33b935d79f245838a1c0a572bc1d8a4.mailgun.com"
 
 JS_ORIGIN = os.environ.get('JS_ORIGIN')
