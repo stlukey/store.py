@@ -47,7 +47,7 @@ def apply_caching(response):
     response.headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept"
     return response
 
-@app.route('/')
+@app.route('/test')
 def root():
     return "testing"
 
