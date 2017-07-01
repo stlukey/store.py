@@ -115,7 +115,7 @@ class Document(object):
 
     @classmethod
     def find_(cls, *args, **kwargs):
-        return map(cls, cls._collection.find(*args, **kwargs))
+        return list(map(cls, cls._collection.find(*args, **kwargs)))
 
     @classmethod
     def find_one(cls, **kwargs):
