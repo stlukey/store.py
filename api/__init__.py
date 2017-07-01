@@ -37,6 +37,8 @@ def config_app(app):
 
     app.register_blueprint(admin)
 
+    return app
+
 #@app.after_request
 def apply_caching(response):
     response.headers["Access-Control-Allow-Origin"] =  app.config.get('JS_ORIGIN')
@@ -50,7 +52,7 @@ def root():
     return "testing"
 
 def main():
-    config_app(app)
+    app = config_app(app)
     app.run(threaded=True)
 
 
