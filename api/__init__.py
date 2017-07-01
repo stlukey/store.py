@@ -24,20 +24,19 @@ if os.environ['APPENLIGHT_API_KEY']:
     app = appenlight.add_appenlight(app,
         {'appenlight.api_key':os.environ['APPENLIGHT_API_KEY']})
 
-def config_app(app):
-    from .utils import ObjectIDConverter
-    app.url_map.converters['ObjectID'] = ObjectIDConverter
 
-    admin = Blueprint('api', __name__, url_prefix='/admin')
+from .utils import ObjectIDConverter
+app.url_map.converters['ObjectID'] = ObjectIDConverter
 
-    from .resources import register_resources
-    from .admin_resources import register_resources as register_admin_resources
-    register_resources(app)
-    register_admin_resources(admin)
+admin = Blueprint('api', __name__, url_prefix='/admin')
 
-    app.register_blueprint(admin)
+from .resources import register_resources
+from .admin_resources import register_resources as register_admin_resources
+register_resources(app)
+register_admin_resources(admin)
 
-    return app
+app.register_blueprint(admin)
+
 
 #@app.after_request
 def apply_caching(response):
@@ -52,7 +51,6 @@ def root():
     return "testing"
 
 def main():
-    app = config_app(app)
     app.run(threaded=True)
 
 
