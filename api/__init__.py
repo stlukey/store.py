@@ -15,8 +15,8 @@ tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 app.config.from_pyfile('config.py')
 app.jinja_env.globals['JS_ORIGIN'] = app.config.get('JS_ORIGIN')
-#cors = CORS(app, resources={r"/*": {"origins": app.config.get('JS_ORIGIN')}},
-#            supports_credentials=True)
+cors = CORS(app, resources={r"/*": {"origins": app.config.get('JS_ORIGIN')}},
+            supports_credentials=True)
 
 mail = Mail(app)
 
