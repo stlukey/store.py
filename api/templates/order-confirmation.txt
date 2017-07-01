@@ -5,7 +5,7 @@ Thank you for your order!
 
 We have recieved your order and will proccess it shortly. You can view its
 current status at:
-{{ JS_ORIGIN + "/order/" + order.id|string }}
+{{ JS_ORIGIN + "/orders/" + order.id|string }}
 
 Thanks again for your buisness!
 Maryam.
