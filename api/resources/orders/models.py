@@ -39,4 +39,4 @@ class Order(Document):
         return kwargs
 
     def can_view(self, user):
-        return self._doc['user'] == user.id
+        return user.admin or (self._doc['user'] == user.id)

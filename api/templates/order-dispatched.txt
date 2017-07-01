@@ -1,0 +1,9 @@
+Hi {{ user.first_name }} {{ user.last_name }},
+
+Order # {{ order.id|string }}
+Your order has been dispatched.
+You can view it at:
+{{ JS_ORIGIN + "/order/" + order.id|string }}
+
+Thanks again for your buisness!
+Maryam.

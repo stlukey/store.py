@@ -11,4 +11,3 @@ sys.path.insert(0, parent_dir)
 from api import main
 
 main()
-

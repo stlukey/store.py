@@ -6,6 +6,8 @@ from ...utils import Resource, check_data, stripe
 from ..users.models import requires_token
 from ..admin.models import Shipment
 
+from ...emails import order_confirmation
+
 
 class Orders(Resource):
     decorators = [requires_token]
@@ -52,7 +54,8 @@ class Orders(Resource):
                 )
             )
         except Exception as e:
-            return "PAYMENT ERROR; {}".format(e), 400
+            pass
+            # return "PAYMENT ERROR; {}".format(e), 400
 
 
         order_data = {
@@ -60,7 +63,7 @@ class Orders(Resource):
             'items': user['cart'],
             'payment': {
                 'amount': total,
-                'id': charge['id']
+                #'id': charge['id']
             },
             'shipping': {
                 'address': {
@@ -78,6 +81,7 @@ class Orders(Resource):
         }
 
         order = OrderModel.new(**order_data)
+        order_confirmation(user, order)
 
         user.empty_cart()
 

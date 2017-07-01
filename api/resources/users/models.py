@@ -31,6 +31,9 @@ def requires_token(func):
     return check_token
 
 def requires_admin():
+    if request.method == 'OPTIONS':
+        return
+
     token = request.cookies.get('token')
     if not token:
         return "Access denied; no token", 401

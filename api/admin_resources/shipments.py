@@ -2,7 +2,6 @@ from flask import request
 from ..utils import Resource, check_data
 from ..resources.admin import models
 from ..resources.orders.models import Order
-from datetime import datetime
 
 
 class Shipments(Resource):
@@ -16,10 +15,9 @@ class Shipments(Resource):
         current = models.Shipment.get_current()
         if current.exists:
             return "BAD REQUEST; Shipment pending.", 400
-        
 
-        orders_pending = Order._collection.find({'shipping.shipment': {'$exists': False}})
-        orders_pending = [Order(order['_id']) for order in orders_pending]
+
+        orders_pending = Order.find_({'shipping.shipment': {'$exists': False}})
         if len(orders_pending) == 0:
             return "BAD REQUEST; No orders awaiting shipment.", 400
 
@@ -38,7 +36,8 @@ class Shipments(Resource):
         if not current.exists:
             return "BAD REQUEST; No shipment pending.", 400
 
-        current.update(_set=dict(dispatch_datetime=datetime.now()))
+        current.mark_as_dispatched()
+
         return current
 
 class Shipment(Resource):

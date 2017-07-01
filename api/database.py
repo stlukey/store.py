@@ -66,7 +66,7 @@ class Document(object):
 
     @classmethod
     def new(cls, **kwargs):
-        """ 
+        """
         Insert new document.
 
         :param kwargs: values
@@ -91,6 +91,9 @@ class Document(object):
         return kwargs
 
     def __init__(self, _id=None, _doc=None, **kwargs):
+        if isinstance(_id, dict):
+            _doc = _id
+
         if _doc is not None:
             self._doc = _doc
             return
@@ -108,7 +111,11 @@ class Document(object):
         if _sort:
             docs = docs.sort(*_sort)
 
-        return [cls(doc['_id']) for doc in docs]
+        return [cls(doc) for doc in docs]
+
+    @classmethod
+    def find_(cls, *args, **kwargs):
+        return map(cls, cls._collection.find(*args, **kwargs))
 
     @classmethod
     def find_one(cls, **kwargs):

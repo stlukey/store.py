@@ -2,6 +2,7 @@
 Utils
 """
 import os
+from threading import Thread
 from flask import request
 from flask_restful import Resource
 from werkzeug.routing import BaseConverter, ValidationError
@@ -83,3 +84,17 @@ def check_data(data, allowed=[], required=False):
                                BAD_REQUEST_CODE)
 
     return True, None
+
+def in_context(f):
+    from . import app
+    def wrapper(*args, **kwargs):
+        with app.app_context():
+            return f(*args, **kwargs)
+    return wrapper
+
+def async(f):
+    f = in_context(f)
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper

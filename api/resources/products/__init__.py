@@ -26,10 +26,10 @@ class ProductImage(Resource):
     def get(self, id):
         if id == 'placeholder':
             return redirect('https://placehold.it/410x308')
-        
+
         id = ObjectId(id)
         image = models.get_image(id)
-        return send_file(image)
+        return send_file(image, mimetype='image/jpeg')
 
 
 class Products(Resource):
@@ -79,4 +79,3 @@ def register_resources(api):
 
     api.add_resource(Categories, '/categories/')
     api.add_resource(Category, '/categories/<string:id>')
-
