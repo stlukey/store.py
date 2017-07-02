@@ -36,7 +36,7 @@ def order_dispatched(user, order):
 
 def email_activation(email):
     email_token = generate_confirmation_token(email)
-    return send_email("User Acount Activation",
+    return send_email("User Account Activation",
                email,
                render_template("activation.txt",
                                email_token=email_token))
