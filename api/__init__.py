@@ -7,7 +7,6 @@ import os
 
 from flask import Flask, Blueprint, url_for
 from flask_cors import CORS
-from flask_mail import Mail
 import appenlight_client.ext.flask as appenlight
 
 
@@ -17,8 +16,6 @@ app.config.from_pyfile('config.py')
 app.jinja_env.globals['JS_ORIGIN'] = app.config.get('JS_ORIGIN')
 cors = CORS(app, resources={r"/*": {"origins": app.config.get('JS_ORIGIN')}},
             supports_credentials=True)
-
-mail = Mail(app)
 
 if os.environ['APPENLIGHT_API_KEY']:
     app = appenlight.add_appenlight(app,

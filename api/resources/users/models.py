@@ -4,13 +4,12 @@ from passlib.hash import bcrypt
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 from functools import wraps
-from flask import request, make_response
+from flask import request, make_response, current_app
 from bson.objectid import ObjectId
 
 from ...database import db, Document
 from ..products.models import Product
 from .package import package
-
 
 def requires_token(func):
     @wraps(func)
@@ -71,7 +70,6 @@ class User(Document):
 
     @staticmethod
     def _format_new(**kwargs):
-        # TODO: Add email verification.
 
         kwargs['password'] = bcrypt.hash(kwargs['password'])
         kwargs['cart'] = {}
@@ -82,7 +80,7 @@ class User(Document):
         return {
             **kwargs,
             'create_time': datetime.now(),
-            'active': True
+            'active': False
         }
 
     def check_password(self, password):

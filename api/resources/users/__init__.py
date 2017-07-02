@@ -2,6 +2,11 @@ from flask import request, make_response
 from ...utils import Resource, check_data
 from .models import *
 
+from ...emails import email_activation
+
+from .activation import confirm_email_token
+
+import datetime
 
 class Users(Resource):
     _decorators = {
@@ -24,10 +29,20 @@ class Users(Resource):
         if not allowed:
             return resp
 
-        if User(data['_id']).exists:
-            return "Conflict; email already exists.", 409
+
+        user = User(data['_id'])
+        if user.exists:
+            if (user['active'] or
+                user['datetime'] < datetime.datetime.now()
+                                  -datetime.timedelta(days=1)):
+                return "Conflict; email already exists.", 409
+
+            # If user has not activated email for more than 24 hours.
+            user.delete()
+
 
         user = User.new(**data)
+        email_activation(user.id)
         return user
 
     def put(self, user):
@@ -63,6 +78,9 @@ class UserToken(Resource):
         if not password:
             return "Authentication Error; no pass", 401
 
+        if not user['active']:
+            return "Authentication Error; email not validated.", 401
+
         token = user.generate_auth_token()
 
         resp = make_response('{"message": "SUCCESS"}')
@@ -70,7 +88,18 @@ class UserToken(Resource):
 
         return resp
 
+class ConfirmEmail(Resource):
+    def post(self, email_token):
+        email = confirm_email_token(email_token)
+        if not email:
+            return "Bad Request; email token invalid.", 400
+
+        user = User(email)
+        user.update({'active': True})
+        return user
+
 
 def register_resources(api):
     api.add_resource(Users, '/user')
+    api.add_resource(ConfirmEmail, '/confirm/<string:email_token>')
     api.add_resource(UserToken, '/token/<string:email>')

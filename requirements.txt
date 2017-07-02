@@ -21,8 +21,10 @@ pycparser==2.17
 pyjade==4.0.0
 pymongo==3.4.0
 python-dateutil==2.6.0
+python-http-client==2.3.0
 pytz==2016.10
 requests==2.12.4
+sendgrid==4.2.0
 six==1.10.0
 stripe==1.61.0
 WebOb==1.7.0

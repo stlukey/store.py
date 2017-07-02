@@ -1,17 +1,24 @@
 from flask import render_template
-from flask_mail import Message
+import sendgrid
+from sendgrid.helpers.mail import *
 
-from .config import SERVER_EMAIL
+from .config import SERVER_EMAIL, SENDGRID_API_KEY
 from .utils import async
 
-@async
-def send_email(subject, recipients, text_body):
-    from . import mail
-    msg = Message(subject, sender=SERVER_EMAIL, recipients=recipients)
+from .resources.users.activation import generate_confirmation_token
 
-    msg.body = text_body
-    #msg.html = html_body
-    mail.send(msg)
+sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
+
+
+
+#@async
+def send_email(subject, to, content):
+    from_email = Email(SERVER_EMAIL)
+    to_email = Email(to)
+    content = Content("text/plain", content)
+    mail = Mail(from_email, subject, to_email, content)
+    return sg.client.mail.send.post(request_body=mail.get())
+
 
 def order_confirmation(user, order):
     send_email("Order Confirmation",
@@ -24,3 +31,12 @@ def order_dispatched(user, order):
                [user.id],
                render_template("order-dispatched.txt",
                                user=user, order=order))
+
+
+
+def email_activation(email):
+    email_token = generate_confirmation_token(email)
+    return send_email("User Acount Activation",
+               email,
+               render_template("activation.txt",
+                               email_token=email_token))

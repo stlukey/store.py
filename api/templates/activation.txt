@@ -1,6 +1,6 @@
 A new account at Maryam's Ingredients has been set-up.
 
 The following link should be used to activate your account.
-{{ activation_link }}
+{{ JS_ORIGIN + "/confirm/" + email_token }}
 
 If you cannot follow the link copy and paste it into your browser.
