@@ -3,12 +3,15 @@ from ...utils import Resource
 from . import models
 from bson.objectid import ObjectId
 
+ERROR_PRODUCT_NOT_FOUND =  "That product can not be found."
+ERROR_CATEGORY_NOT_FOUND = "That category can not be found."
+
 
 def pass_product(func):
     def wrapped(id, *args, **kwargs):
         product = models.Product(id)
         if not product.exists:
-            return "NOT FOUND", 404
+            return ERROR_PRODUCT_NOT_FOUND, 404
 
         return func(product, *args, **kwargs)
     return wrapped
@@ -18,7 +21,7 @@ class Product(Resource):
     decorators = [pass_product]
     def get(self, product):
         if not product['active']:
-            return "NOT FOUND", 404
+            return ERROR_PRODUCT_NOT_FOUND, 404
         return product
 
 
@@ -58,7 +61,7 @@ class Category(Resource):
     def get(self, id):
         category = models.Category(id)
         if not category.exists:
-            return "NOT FOUND", 404
+            return ERROR_CATEGORY_NOT_FOUND, 404
         return category.products
 
 

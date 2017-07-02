@@ -5,8 +5,17 @@ from .models import *
 from ...emails import email_activation
 
 from .activation import confirm_email_token
+from ...utils import make_json_response
 
 import datetime
+
+ERROR_EMAIL_CONFLICT = "That email already exists."
+ERROR_BAD_LOGIN = "Incorrect email/password. Please try again."
+ERROR_NOT_ACTIVATED = "Account not activated. Please check your email."
+ERROR_BAD_EMAIL_TOKEN = "Email token invalid. Please try again."
+
+ACCOUNT_CREATED_MESSAGE =\
+"Account Created. Please check your email for an activation link."
 
 class Users(Resource):
     _decorators = {
@@ -35,15 +44,18 @@ class Users(Resource):
             if (user['active'] or
                 user['datetime'] < datetime.datetime.now()
                                   -datetime.timedelta(days=1)):
-                return "Conflict; email already exists.", 409
+                return ERROR_EMAIL_CONFLICT, 409
 
             # If user has not activated email for more than 24 hours.
             user.delete()
 
+        data['first_name'] = data['first_name'].title()
+        data['last_name'] = data['last_name'].title()
+
 
         user = User.new(**data)
         email_activation(user.id)
-        return user
+        return make_json_response(message=ACCOUNT_CREATED_MESSAGE)
 
     def put(self, user):
         ALLOWED = [
@@ -69,34 +81,30 @@ class UserToken(Resource):
     def post(self, email):
         user = User(email)
         if not user.exists:
-            return "Authentication Error; no user", 401
+            return ERROR_BAD_LOGIN, 401
 
         data = request.get_json(force=True)
         password = data.get('password')
         if password:
             password = user.check_password(password)
         if not password:
-            return "Authentication Error; no pass", 401
+            return ERROR_BAD_LOGIN, 401
 
         if not user['active']:
-            return "Authentication Error; email not validated.", 401
+            return ERROR_NOT_ACTIVATED, 401
 
-        token = user.generate_auth_token()
-
-        resp = make_response('{"message": "SUCCESS"}')
-        resp.set_cookie('token', token)
-
-        return resp
+        return user.encode_auth_token().decode()
 
 class ConfirmEmail(Resource):
     def post(self, email_token):
         email = confirm_email_token(email_token)
         if not email:
-            return "Bad Request; email token invalid.", 400
+            return ERROR_BAD_EMAIL_TOKEN, 400
 
         user = User(email)
         user.update({'active': True})
-        return user
+
+        return make_json_response(status=200, message="Account activated.")
 
 
 def register_resources(api):

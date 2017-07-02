@@ -5,6 +5,10 @@ from ..resources.products import (Products, Product, ProductImage,
                                   Categories, pass_product)
 from ..resources.products import models
 
+ERROR_NOT_MODIFIED =\
+"An error occurred. Product has not been modified. Please try again."
+ERROR_IMAGE_NOT_FOUND = "The image could not be found."
+
 
 def valid_file(image):
     return image.content_type == 'image/jpeg'
@@ -81,7 +85,7 @@ class ProductAdmin(Product):
         if data:
             res = product.update(**kwargs)
             if not res['nModified']:
-                return "SEVER ERROR; not modified.", 500
+                return ERROR_NOT_MODIFIED, 500
 
         return product
 
@@ -99,7 +103,7 @@ class ProductImageAdmin(Resource):
 
     def put(self, product, image_index):
         if image_index > len(product['images']):
-            return "NOT FOUND; image does not exist", 404
+            return ERROR_IMAGE_NOT_FOUND, 404
 
         file = request.files['file']
         if not valid_file(file):
@@ -114,7 +118,7 @@ class ProductImageAdmin(Resource):
 
     def delete(self, product, image_index):
         if image_index >= len(product['images']):
-            return "NOT FOUND; image does not exist", 404
+            return ERROR_IMAGE_NOT_FOUND, 404
 
         del product['images'][image_index]
         product.update()

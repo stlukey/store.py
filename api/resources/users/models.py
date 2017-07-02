@@ -1,51 +1,56 @@
 import os
-from datetime import datetime
+import datetime
 from passlib.hash import bcrypt
-from itsdangerous import (TimedJSONWebSignatureSerializer
-                          as Serializer, BadSignature, SignatureExpired)
 from functools import wraps
-from flask import request, make_response, current_app
+from flask import request, make_response, current_app, request
 from bson.objectid import ObjectId
+import jwt
 
 from ...database import db, Document
+from ...utils import make_json_response, default_dec
 from ..products.models import Product
 from .package import package
 
+ERROR_LOGIN_REQUIRED = 'You must login to do that.'
+ERROR_SESSION_EXPIRED = 'Session expired. Please login again.'
+ERROR_NOT_ACTIVATED = 'Account not active. Please check your email.'
+ERROR_NOT_ADMIN = "You must be an admin to do that!"
+
 def requires_token(func):
     @wraps(func)
+    @default_dec
     def check_token(*args, **kwargs):
-        token = request.cookies.get('token')
-        if not token:
-            return "Access denied; no token", 401
 
-        user = User.verify_auth_token(token)
-        if not user or not user.exists:
-            response = make_response("Token expired")
-            response.status_code = 419
-            response.set_cookie('token', '', expires=0)
-            return response
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            auth_token = auth_header.split(" ")[1]
+        else:
+            auth_token = ' '
+        if not auth_token:
+            return ERROR_LOGIN_REQUIRED, 401
+
+        try:
+            user = User.decode_auth_token(auth_token)
+        except jwt.ExpiredSignatureError:
+            return ERROR_SESSION_EXPIRED, 401
+        except jwt.InvalidTokenError:
+            return ERROR_SESSION_EXPIRED, 401
+
+        if not user['active']:
+            return ERROR_NOT_ACTIVATED, 401
 
         return func(user, *args, **kwargs)
 
     return check_token
 
-def requires_admin():
-    if request.method == 'OPTIONS':
-        return
-
-    token = request.cookies.get('token')
-    if not token:
-        return "Access denied; no token", 401
-
-    user = User.verify_auth_token(token)
-    if not user or not user.exists:
-        response = make_response("Token expired")
-        response.status_code = 419
-        response.set_cookie('token', '', expires=0)
-        return response
-
-    if not user.admin:
-        return "Access denied; not admin", 401
+@requires_token
+def requires_admin(f):
+    @wraps(f)
+    def check_admin(user, *args, **kwargs):
+        if not user.admin:
+            return ERROR_NOT_ADMIN, 403
+        return f(user, *args, **kwargs)
+    return check_token
 
 
 class User(Document):
@@ -79,7 +84,7 @@ class User(Document):
 
         return {
             **kwargs,
-            'create_time': datetime.now(),
+            'create_time': datetime.datetime.now(),
             'active': False
         }
 
@@ -89,26 +94,38 @@ class User(Document):
     @classmethod
     def login(cls, email, password):
         user = cls(email)
-        if user.exists and bcrypt.verify(password, user['password']):
+        if user.exists and user.check_password(password):
             return True
         return False
 
-    def generate_auth_token(self, expiration=60 * 60):
-        s = Serializer(os.environ['FLASK_SECRET'], expires_in=expiration)
-        return s.dumps({'id': self.id})
+    def encode_auth_token(self):
+        """
+        Generates the Auth Token.
+        :return: string
+        """
+        payload = {
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1),
+            'iat': datetime.datetime.utcnow(),
+            'sub': self.id
+        }
+        return jwt.encode(
+            payload,
+            current_app.config.get('SECRET_KEY'),
+            algorithm='HS256'
+        )
 
     @classmethod
-    def verify_auth_token(cls, token):
-        s = Serializer(os.environ['FLASK_SECRET'])
-        try:
-            data = s.loads(token)
-        except SignatureExpired:
-            # valid token, but expired
-            return None
-        except BadSignature:
-            # invalid token
-            return None
-        user = cls(data['id'])
+    def decode_auth_token(cls, auth_token):
+        """
+        Decodes the auth token.
+        :param auth_token:
+        :return: integer|string
+        :raises: ExpiredSignatureError, InvalidTokenError
+        """
+        payload = jwt.decode(auth_token, current_app.config.get('SECRET_KEY'))
+        user = cls(payload['sub'])
+        if not user.exists:
+            raise jwt.InvalidTokenError
         return user
 
     def add_to_cart(self, item, amount=None):

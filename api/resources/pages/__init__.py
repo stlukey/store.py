@@ -1,12 +1,15 @@
 from ...utils import Resource
 from . import models
 
+ERROR_PAGE_NOT_FOUND =\
+"That page can not be found."
+
 
 class Page(Resource):
     def get(self, id):
         page = models.Page(id)
         if not page.exists:
-            return "NOT FOUND", 404
+            return ERROR_PAGE_NOT_FOUND, 404
         return page
 
 

@@ -1,10 +1,13 @@
 from flask import request
 from bson.objectid import ObjectId
 
-from ...utils import Resource
+from ...utils import Resource, check_data
 from ..users.models import *
 from ..products import pass_product
 from ..products.models import Product
+
+ERROR_NOT_MODIFIED =\
+"An error occurred. Cart has not been modified. Please try again."
 
 
 class Cart(Resource):
@@ -16,7 +19,7 @@ class Cart(Resource):
     def delete(self, user):
         res = user.update({'cart': {}})
         if not res['nModified']:
-            return "SERVER ERROR; not modified.", 500
+            return ERROR_NOT_MODIFIED, 500
         return {}
 
 
@@ -30,16 +33,17 @@ class CartItem(Resource):
 
         res = user.update({'cart': cart})
         if not res['nModified']:
-            return "SERVER ERROR; not modified.", 500
+            return ERROR_NOT_MODIFIED, 500
 
         return cart
 
     def put(self, user, product):
         ALLOWED = ['quantity']
         data = request.get_json(force=True)
-        for k in data.keys():
-            if k not in ALLOWED:
-                return "BAD REQUEST; '{}' not allowed".format(k), 400
+
+        allowed, resp = check_data(data, ALLOWED)
+        if not allowed:
+            return resp
 
         cart = user['cart']
         quantity = data.get('quantity', cart.get(str(product.id), 0))
@@ -47,7 +51,7 @@ class CartItem(Resource):
 
         res = user.update({'cart': cart})
         if not res['nModified']:
-            return "SERVER ERROR; not modified.", 500
+            return ERROR_NOT_MODIFIED, 500
 
         return cart
 
@@ -58,7 +62,7 @@ class CartItem(Resource):
 
         res = user.update({'cart': cart})
         if not res['nModified']:
-            return "SERVER ERROR; not modified.", 500
+            return ERROR_NOT_MODIFIED, 500
 
         return cart
 

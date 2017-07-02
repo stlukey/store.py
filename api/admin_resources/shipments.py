@@ -3,6 +3,10 @@ from ..utils import Resource, check_data
 from ..resources.admin import models
 from ..resources.orders.models import Order
 
+ERROR_SHIPMENT_PENDING = "A shipment is already pending."
+ERROR_NO_ORDERS_TO_SHIP = "No orders are awaiting shipment."
+ERROR_NOTHING_TO_DISPATCH = "There is no pending shipment to mark as dispatched."
+ERROR_SHIPMENT_NOT_FOUND = "That shipment can not be found."
 
 class Shipments(Resource):
     def get(self):
@@ -14,12 +18,12 @@ class Shipments(Resource):
         """
         current = models.Shipment.get_current()
         if current.exists:
-            return "BAD REQUEST; Shipment pending.", 400
+            return ERROR_SHIPMENT_PENDING, 400
 
 
         orders_pending = Order.find_({'shipping.shipment': {'$exists': False}})
         if len(orders_pending) == 0:
-            return "BAD REQUEST; No orders awaiting shipment.", 400
+            return ERROR_NO_ORDERS_TO_SHIP, 400
 
         current = models.Shipment.new()
 
@@ -34,7 +38,7 @@ class Shipments(Resource):
         """
         current = models.Shipment.get_current()
         if not current.exists:
-            return "BAD REQUEST; No shipment pending.", 400
+            return ERROR_NOTHING_TO_DISPATCH, 400
 
         current.mark_as_dispatched()
 
@@ -44,7 +48,7 @@ class Shipment(Resource):
     def get(self, _id):
         shipment = models.Shipment(_id)
         if not shipment.exists:
-            return "NOT FOUND", 404
+            return ERROR_SHIPMENT_NOT_FOUND, 404
 
         orders = Order._collection.find({'shipping.shipment': shipment.id})
 

@@ -8,6 +8,12 @@ from ..admin.models import Shipment
 
 from ...emails import order_confirmation
 
+ERROR_CHARGE_CREATION =\
+"An error occured while creating the charge. Please check your details."
+ERROR_ORDER_NOT_FOUND =\
+"That order could not be found."
+ERROR_ORDER_FORBIDDEN =\
+"That order is not accessible to you."
 
 class Orders(Resource):
     decorators = [requires_token]
@@ -54,8 +60,7 @@ class Orders(Resource):
                 )
             )
         except Exception as e:
-            pass
-            # return "PAYMENT ERROR; {}".format(e), 400
+            return ERROR_CHARGE_CREATION, 400
 
 
         order_data = {
@@ -93,10 +98,10 @@ class Order(Resource):
     def get(self, user, _id):
         order = OrderModel(_id)
         if not order.exists:
-            return "NOT FOUND", 404
+            return ERROR_ORDER_NOT_FOUND, 404
 
         if not order.can_view(user):
-            return "FORBIDDEN", 403
+            return ERROR_ORDER_FORBIDDEN, 403
 
         status = "pending"
         if ('shipment' in order._doc['shipping'] and

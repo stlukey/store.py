@@ -8,6 +8,7 @@ from flask_restful import Resource
 from werkzeug.routing import BaseConverter, ValidationError
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
+import http
 
 import easypost
 easypost.api_key = os.environ['EASYPOST_API_KEY']
@@ -17,6 +18,14 @@ stripe.api_key = os.environ['STRIPE_KEY']
 
 from .database import Document
 
+def make_json_response(status=200, message=None, data=None):
+    resp = {}
+    resp['status'] = http.HTTPStatus(status).phrase
+    if message is not None:
+        resp['message'] = message
+    if data is not None:
+        resp['data'] = data
+    return resp, status
 
 class ObjectIDConverter(BaseConverter):
     def to_python(self, value):
@@ -28,18 +37,27 @@ class ObjectIDConverter(BaseConverter):
     def to_url(self, value):
         return str(value)
 
+def to_json(res):
+    if isinstance(res, Document):
+        res = dict(res)
+    elif isinstance(res, list):
+        if len(res) == 0:
+            res = []
+        elif isinstance(res[0], Document):
+            res = map(dict, res)
+    return res
+
 
 def default_dec(func):
     def wrapped(*args, **kwargs):
         res = func(*args, **kwargs)
-        if isinstance(res, Document):
-            res = dict(res)
-        elif isinstance(res, list):
-            if len(res) == 0:
-                res = []
-            elif isinstance(res[0], Document):
-                res = map(dict, res)
-        return res
+        if isinstance(res, tuple):
+            message, status = res
+            data = None
+        else:
+            message, status = None, 200
+            data = to_json(res)
+        return make_json_response(status, message, data)
     return wrapped
 
 
@@ -69,8 +87,8 @@ class Resource(Resource):
 
 
 def check_data(data, allowed=[], required=False):
-    BAD_REQUEST = "BAD REQUEST; '{}' is invalid"
-    BAD_REQUEST_REQUIRED = "BAD REQUEST; required value '{}' missing"
+    BAD_REQUEST = "There was an error processing the request. '{}' is invalid"
+    BAD_REQUEST_REQUIRED = "There was an error processing the request. Required value '{}' is missing."
     BAD_REQUEST_CODE = 400
 
     for k in data:

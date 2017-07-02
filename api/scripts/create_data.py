@@ -86,7 +86,8 @@ def generate_user():
         password='password',
         first_name='user',
         last_name='name',
-        admin=False
+        admin=False,
+        active=True
     )
 
     print(' ' * 4 * 2 + "Email: " + user.id)
@@ -101,7 +102,8 @@ def generate_admin():
         password='password',
         first_name='admin',
         last_name='',
-        admin=True
+        admin=True,
+        active=True
     )
 
     print(' ' * 4 * 2 + "Email: " + user.id)

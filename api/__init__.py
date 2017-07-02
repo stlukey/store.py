@@ -13,6 +13,8 @@ import appenlight_client.ext.flask as appenlight
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 app.config.from_pyfile('config.py')
+
+
 app.jinja_env.globals['JS_ORIGIN'] = app.config.get('JS_ORIGIN')
 cors = CORS(app, resources={r"/*": {"origins": app.config.get('JS_ORIGIN')}},
             supports_credentials=True)
@@ -33,15 +35,6 @@ register_resources(app)
 register_admin_resources(admin)
 
 app.register_blueprint(admin)
-
-
-#@app.after_request
-def apply_caching(response):
-    response.headers["Access-Control-Allow-Origin"] =  app.config.get('JS_ORIGIN')
-    response.headers["Access-Control-Allow-Credentials"] = 'true'
-    response.headers["Access-Control-Allow-Methods"] = 'GET, POST, PUT, DELETE'
-    response.headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept"
-    return response
 
 @app.route('/test')
 def root():
