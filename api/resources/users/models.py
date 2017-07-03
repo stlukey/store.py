@@ -43,14 +43,26 @@ def requires_token(func):
 
     return check_token
 
-@requires_token
-def requires_admin(f):
-    @wraps(f)
-    def check_admin(user, *args, **kwargs):
-        if not user.admin:
-            return ERROR_NOT_ADMIN, 403
-        return f(user, *args, **kwargs)
-    return check_token
+def requires_admin():
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        auth_token = auth_header.split(" ")[1]
+    else:
+        auth_token = ' '
+    if not auth_token:
+        return ERROR_LOGIN_REQUIRED, 401
+
+    try:
+        user = User.decode_auth_token(auth_token)
+    except jwt.ExpiredSignatureError:
+        return ERROR_SESSION_EXPIRED, 401
+    except jwt.InvalidTokenError:
+        return ERROR_SESSION_EXPIRED, 401
+
+    if not user['admin']:
+        return ERROR_NOT_ADMIN, 403
+
+
 
 
 class User(Document):
@@ -82,10 +94,12 @@ class User(Document):
         if 'admin' not in kwargs:
             kwargs['admin'] = False
 
+        if 'active' not in kwargs:
+            kwargs['active'] = False
+
         return {
             **kwargs,
-            'create_time': datetime.datetime.now(),
-            'active': False
+            'create_time': datetime.datetime.now()
         }
 
     def check_password(self, password):

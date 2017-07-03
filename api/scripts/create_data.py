@@ -86,7 +86,7 @@ def generate_user():
         password='password',
         first_name='user',
         last_name='name',
-        admin=False,
+        admin=True,
         active=True
     )
 

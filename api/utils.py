@@ -51,9 +51,16 @@ def to_json(res):
 def default_dec(func):
     def wrapped(*args, **kwargs):
         res = func(*args, **kwargs)
+        print('running')
         if isinstance(res, tuple):
             message, status = res
             data = None
+            if isinstance(message, dict):
+                data = message
+                message = None
+            if isinstance(data, dict) and \
+               {'message', 'status', 'data'} > data.keys():
+               return data, status
         else:
             message, status = None, 200
             data = to_json(res)

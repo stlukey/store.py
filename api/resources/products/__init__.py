@@ -2,6 +2,7 @@ from flask import send_file, redirect
 from ...utils import Resource
 from . import models
 from bson.objectid import ObjectId
+from flask_restful import Resource as Resource_
 
 ERROR_PRODUCT_NOT_FOUND =  "That product can not be found."
 ERROR_CATEGORY_NOT_FOUND = "That category can not be found."
@@ -25,7 +26,7 @@ class Product(Resource):
         return product
 
 
-class ProductImage(Resource):
+class ProductImage(Resource_):
     def get(self, id):
         if id == 'placeholder':
             return redirect('https://placehold.it/410x308')
@@ -73,12 +74,13 @@ class Categories(Resource):
 
 
 def register_resources(api):
-    api.add_resource(Products, '/products/')
+    api.add_resource(Products, '/products')
     api.add_resource(ProductsLatest, '/products/latest')
     api.add_resource(ProductsPopular, '/products/popular')
 
     api.add_resource(Product, '/products/<ObjectID:id>')
     api.add_resource(ProductImage, '/images/<id>.jpg')
 
-    api.add_resource(Categories, '/categories/')
+
+    api.add_resource(Categories, '/categories')
     api.add_resource(Category, '/categories/<string:id>')

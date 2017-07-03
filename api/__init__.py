@@ -5,8 +5,7 @@ Main application.
 
 import os
 
-from flask import Flask, Blueprint, url_for
-from flask_cors import CORS
+from flask import Flask, Blueprint, url_for, request
 import appenlight_client.ext.flask as appenlight
 
 
@@ -16,8 +15,22 @@ app.config.from_pyfile('config.py')
 
 
 app.jinja_env.globals['JS_ORIGIN'] = app.config.get('JS_ORIGIN')
-cors = CORS(app, resources={r"/*": {"origins": app.config.get('JS_ORIGIN')}},
-            supports_credentials=True)
+
+def set_access_control(response):
+    response.headers["Access-Control-Allow-Origin"] = os.environ['JS_ORIGIN']
+    response.headers["Access-Control-Allow-Credentials"] = 'true'
+    response.headers["Access-Control-Allow-Methods"] = 'GET, POST, PUT, DELETE'
+    response.headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    return response
+
+app.after_request(set_access_control)
+
+@app.before_request
+def before():
+    if request.method == 'OPTIONS':
+        return 'OK', 200
+
+
 
 if os.environ['APPENLIGHT_API_KEY']:
     app = appenlight.add_appenlight(app,

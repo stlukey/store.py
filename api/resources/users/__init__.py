@@ -2,7 +2,7 @@ from flask import request, make_response
 from ...utils import Resource, check_data
 from .models import *
 
-from ...emails import email_activation
+from ...emails import email_activation, recovery_email
 
 from .activation import confirm_email_token
 from ...utils import make_json_response
@@ -14,8 +14,14 @@ ERROR_BAD_LOGIN = "Incorrect email/password. Please try again."
 ERROR_NOT_ACTIVATED = "Account not activated. Please check your email."
 ERROR_BAD_EMAIL_TOKEN = "Email token invalid. Please try again."
 
-ACCOUNT_CREATED_MESSAGE =\
+ACCOUNT_CREATED_MESSAGE = \
 "Account Created. Please check your email for an activation link."
+ACCOUNT_ACTIVATED_MESSAGE = \
+"Account activated. Please login."
+RECOVER_EMAIL_SENT = \
+"If a matching account was found an email was sent to {} to allow you to reset your password."
+PASSWORD_CHANGED = \
+"Your password was updated. Please login. "
 
 class Users(Resource):
     _decorators = {
@@ -104,10 +110,41 @@ class ConfirmEmail(Resource):
         user = User(email)
         user.update({'active': True})
 
-        return make_json_response(status=200, message="Account activated.")
+        return ACCOUNT_ACTIVATED_MESSAGE, 200
+
+class RecoverPassword(Resource):
+    def post(self, email):
+        user = User(email)
+        if user.exists:
+            recovery_email(user.id)
+
+        return RECOVER_EMAIL_SENT.format(email), 200
+
+    def put(self, email):
+        REQUIRED = [
+            'password',
+        ]
+        email = confirm_email_token(email)
+        if not email:
+            return ERROR_BAD_EMAIL_TOKEN, 400
+
+        user = User(email)
+        if not user.exists:
+            return ERROR_BAD_EMAIL_TOKEN, 400
+
+        data = request.get_json(force=True)
+        allowed, resp = check_data(data, REQUIRED, REQUIRED)
+        if not allowed:
+            return resp
+
+        data['password'] = bcrypt.hash(data['password'])
+        user.update(data)
+
+        return make_json_response(200, PASSWORD_CHANGED)
 
 
 def register_resources(api):
     api.add_resource(Users, '/user')
     api.add_resource(ConfirmEmail, '/confirm/<string:email_token>')
+    api.add_resource(RecoverPassword, '/recover/<string:email>')
     api.add_resource(UserToken, '/token/<string:email>')
