@@ -3,12 +3,13 @@ Utils
 """
 import os
 from threading import Thread
-from flask import request
+from flask import request, make_response
 from flask_restful import Resource
 from werkzeug.routing import BaseConverter, ValidationError
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
-import http
+from bson.json_util import dumps
+from http import HTTPStatus
 
 import easypost
 easypost.api_key = os.environ['EASYPOST_API_KEY']
@@ -17,15 +18,6 @@ import stripe
 stripe.api_key = os.environ['STRIPE_KEY']
 
 from .database import Document
-
-def make_json_response(status=200, message=None, data=None):
-    resp = {}
-    resp['status'] = http.HTTPStatus(status).phrase
-    if message is not None:
-        resp['message'] = message
-    if data is not None:
-        resp['data'] = data
-    return resp, status
 
 class ObjectIDConverter(BaseConverter):
     def to_python(self, value):
@@ -37,35 +29,62 @@ class ObjectIDConverter(BaseConverter):
     def to_url(self, value):
         return str(value)
 
-def to_json(res):
-    if isinstance(res, Document):
-        res = dict(res)
-    elif isinstance(res, list):
-        if len(res) == 0:
-            res = []
-        elif isinstance(res[0], Document):
-            res = map(dict, res)
-    return res
+dict_no_none = lambda d: dict((k, v) for k, v in d.items() if v is not None)
 
+class JSONResponse(object):
+    __dict__ = lambda self: dict_no_none({
+        'status': HTTPStatus(self.status).phrase,
+        'message': self.message,
+        'data': self.data
+    })
 
-def default_dec(func):
-    def wrapped(*args, **kwargs):
-        res = func(*args, **kwargs)
-        print('running')
-        if isinstance(res, tuple):
-            message, status = res
-            data = None
-            if isinstance(message, dict):
-                data = message
-                message = None
-            if isinstance(data, dict) and \
-               {'message', 'status', 'data'} > data.keys():
-               return data, status
+    dump = lambda self: dumps(self.__dict__())
+
+    def __init__(self, message=None, data=None, status=200):
+        self.status = status
+        self.message = message
+        self._data = data
+
+    @property
+    def data(self):
+        data = self._data
+        # MongoDB Doc
+        if isinstance(data, Document):
+            data = dict(data)
+        # List of MongoDB Doc
+        elif isinstance(data, list):
+            if len(data) == 0:
+                data = []
+            elif isinstance(data[0], Document):
+                data = map(dict, data)
+        return data
+
+    @classmethod
+    def make_response(cls, payload, status=200):
+        # payload = JSONResponse(....)
+        if isinstance(payload, cls):
+            obj = payload
+
+        # payload = message
+        elif isinstance(payload, str):
+            obj = cls(payload, None, status)
+
+        # payload = (data, message)
+        elif isinstance(payload, tuple) and len(payload) == 2:
+            data, message = payload
+            obj = cls(message, data, status)
+
+        # payload = data
         else:
-            message, status = None, 200
-            data = to_json(res)
-        return make_json_response(status, message, data)
-    return wrapped
+            obj = cls(None, payload, status)
+
+        return make_response(obj.dump(), status)
+
+
+def output_json(data, status=200, headers=None):
+    resp = JSONResponse.make_response(data, status)
+    resp.headers.extend(headers)
+    return resp
 
 
 class Resource(Resource):
@@ -85,7 +104,6 @@ class Resource(Resource):
 
         view = super(Resource, self).dispatch_request
         decorators = self._decorators.get(request.method.lower())
-        view = default_dec(view)
         if decorators:
             for decorator in decorators:
                 view = decorator(view)

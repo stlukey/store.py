@@ -5,7 +5,7 @@ from .models import *
 from ...emails import email_activation, recovery_email
 
 from .activation import confirm_email_token
-from ...utils import make_json_response
+from ...utils import JSONResponse
 
 import datetime
 
@@ -22,6 +22,8 @@ RECOVER_EMAIL_SENT = \
 "If a matching account was found an email was sent to {} to allow you to reset your password."
 PASSWORD_CHANGED = \
 "Your password was updated. Please login. "
+LOGIN_SUCCESS = \
+"Login successful."
 
 class Users(Resource):
     _decorators = {
@@ -61,7 +63,7 @@ class Users(Resource):
 
         user = User.new(**data)
         email_activation(user.id)
-        return make_json_response(message=ACCOUNT_CREATED_MESSAGE)
+        return ACCOUNT_CREATED_MESSAGE, 200
 
     def put(self, user):
         ALLOWED = [
@@ -99,7 +101,7 @@ class UserToken(Resource):
         if not user['active']:
             return ERROR_NOT_ACTIVATED, 401
 
-        return user.encode_auth_token().decode()
+        return (user.encode_auth_token().decode(), LOGIN_SUCCESS), 200
 
 class ConfirmEmail(Resource):
     def post(self, email_token):
@@ -118,7 +120,7 @@ class RecoverPassword(Resource):
         if user.exists:
             recovery_email(user.id)
 
-        return RECOVER_EMAIL_SENT.format(email), 200
+        return RECOVER_EMAIL_SENT.format(email)
 
     def put(self, email):
         REQUIRED = [
@@ -140,7 +142,7 @@ class RecoverPassword(Resource):
         data['password'] = bcrypt.hash(data['password'])
         user.update(data)
 
-        return make_json_response(200, PASSWORD_CHANGED)
+        return PASSWORD_CHANGED
 
 
 def register_resources(api):

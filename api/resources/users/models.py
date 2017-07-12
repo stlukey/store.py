@@ -2,12 +2,11 @@ import os
 import datetime
 from passlib.hash import bcrypt
 from functools import wraps
-from flask import request, make_response, current_app, request
+from flask import request, current_app, request
 from bson.objectid import ObjectId
 import jwt
 
 from ...database import db, Document
-from ...utils import make_json_response, default_dec
 from ..products.models import Product
 from .package import package
 
@@ -18,7 +17,6 @@ ERROR_NOT_ADMIN = "You must be an admin to do that!"
 
 def requires_token(func):
     @wraps(func)
-    @default_dec
     def check_token(*args, **kwargs):
 
         auth_header = request.headers.get('Authorization')

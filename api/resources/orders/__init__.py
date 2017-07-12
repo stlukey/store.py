@@ -14,6 +14,8 @@ ERROR_ORDER_NOT_FOUND =\
 "That order could not be found."
 ERROR_ORDER_FORBIDDEN =\
 "That order is not accessible to you."
+ORDER_SUCCESSFUL =\
+"Order placed successfully."
 
 class Orders(Resource):
     decorators = [requires_token]
@@ -90,7 +92,7 @@ class Orders(Resource):
 
         user.empty_cart()
 
-        return order
+        return (order, ORDER_SUCCESSFUL), 200
 
 class Order(Resource):
     decorators = [requires_token]

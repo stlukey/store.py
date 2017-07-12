@@ -40,7 +40,7 @@ if os.environ['APPENLIGHT_API_KEY']:
 from .utils import ObjectIDConverter
 app.url_map.converters['ObjectID'] = ObjectIDConverter
 
-admin = Blueprint('api', __name__, url_prefix='/admin')
+admin = Blueprint('admin', __name__, url_prefix='/admin')
 
 from .resources import register_resources
 from .admin_resources import register_resources as register_admin_resources
@@ -48,10 +48,6 @@ register_resources(app)
 register_admin_resources(admin)
 
 app.register_blueprint(admin)
-
-@app.route('/test')
-def root():
-    return "testing"
 
 def main():
     app.run(threaded=True)
