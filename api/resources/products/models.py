@@ -69,13 +69,11 @@ class Product(Document):
             if p2c['category'] not in category_ids:
                 p2c.delete()
 
-        print(current, category_ids)
         for category in category_ids:
-            print(category)
             if category not in current:
                 cat = Category(category)
                 if not cat.exists:
-                    cat = Category.new(category)
+                    cat = Category.new(_id=category)
 
                 ProductToCategory.new(product=self,
                                       category=cat)
@@ -150,7 +148,7 @@ class Category(Document):
 
         else:
             _id = kwargs['_id']
-            for char in name:
+            for char in _id:
                 if not char.islower() and char != '-':
                     raise ValidationError(
                         "Invalid character in category _id: {}"
