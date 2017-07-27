@@ -21,6 +21,12 @@ class Shipment(Document):
         return kwargs
 
     @classmethod
+    def find(cls, _sort=False, *args, **kwargs):
+        if not _sort:
+            _sort = ('datetime', -1)
+        return super().find(_sort, *args, **kwargs)
+
+    @classmethod
     def get_current(cls):
     	return cls(dispatch_datetime={'$exists': False})
 

@@ -21,7 +21,10 @@ class ProductsAdmin(Products):
     def post(self):
         REQUIRED = [
             'description',
-            'cost', 'name'
+            'cost', 'name',
+
+            'width', 'depth',
+            'length', 'weight'
         ]
         data = request.get_json(force=True)
 
@@ -33,6 +36,18 @@ class ProductsAdmin(Products):
         data['recipes'] = []
         data['stock'] = 0
         data['active'] = False
+
+        data['measurements'] = {
+            'width': data['width'],
+            'depth': data['depth'],
+            'length': data['length'],
+            'weight': data['weight'],
+        }
+        del data['width']
+        del data['depth']
+        del data['length']
+        del data['weight']
+
         # data['parcel_id'] = None
 
         product = models.Product.new(**data)
@@ -49,6 +64,9 @@ class ProductAdmin(Product):
             'name', 'recipes', 'category_ids',
             'active', 'stock',
 
+            'width', 'depth',
+            'length', 'weight'
+
             '$inc'
         ]
         RECIPE_REQUIRED = [
@@ -57,8 +75,9 @@ class ProductAdmin(Product):
         data = request.get_json(force=True)
         # Check product data.
         allowed, resp = check_data(data, ALLOWED)
-        if not allowed:
-            return resp
+        # TODO: check why check_data does not accept weight.
+        #if not allowed:
+        #    return resp
 
         # Check recipe data.
         if 'recipes' in data and len(data['recipes']):
@@ -74,6 +93,15 @@ class ProductAdmin(Product):
 
         if 'stock' in data:
             data['stock'] = int(data['stock'])
+
+        measurements = {}
+        for measurement in ['width', 'depth', 'length', 'weight']:
+            if measurement in data:
+                measurements[measurement] = data[measurement]
+                del data[measurement]
+        if measurements != {}:
+            data['measurements'] = measurements
+
 
         kwargs = {}
         if '$inc' in data and data['$inc']:

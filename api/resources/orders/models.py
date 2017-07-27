@@ -27,6 +27,12 @@ class Order(Document):
         'items'
     ]
 
+    @classmethod
+    def find(cls, _sort=False, *args, **kwargs):
+        if not _sort:
+            _sort = ('datetime', -1)
+        return super().find(_sort, *args, **kwargs)
+
     @staticmethod
     def _format_new(**kwargs):
         kwargs['user'] = kwargs['user'].id
