@@ -5,7 +5,7 @@ from gridfs import GridFS
 from ...database import db, Document, ValidationError
 
 
-def user_import():
+def user_and_review_import():
     from ..users.models import User
     global User
 
@@ -109,6 +109,7 @@ class Product(Document):
         return '-'.join(self['name'].lower().split())
 
     def __iter__(self):
+        from ..reviews.models import Review
         changes = {
             'images': lambda imgs: [
                 url_for('productimage', id=img)
@@ -121,6 +122,8 @@ class Product(Document):
         yield 'categories', {
             cat.id: cat.name for cat in self.categories
         }
+
+        yield 'reviews', map(dict, Review.find(product=self))
 
         for k, v in super(Product, self).__iter__():
             if k in changes:
@@ -203,24 +206,4 @@ class ProductToCategory(Document):
         }
 
 
-user_import()
-
-
-class Review(Document):
-    _collection = db.reviews
-    _schema = [
-        'user',
-        'rating',
-        'description',
-        'datetime'
-    ]
-    _check = [
-        'rating',
-        'description'
-    ]
-
-    @staticmethod
-    def _format_new(**kwargs):
-        kwargs['user'] = User(kwargs['user'])
-        kwargs['datetime'] = datetime.now()
-        return kwargs
+user_and_review_import()

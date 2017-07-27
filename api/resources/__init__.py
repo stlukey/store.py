@@ -11,6 +11,7 @@ from . import users
 from . import cart
 from . import pages
 from . import orders
+from . import reviews
 
 
 
@@ -25,3 +26,4 @@ def register_resources(app):
     cart.register_resources(api)
     pages.register_resources(api)
     orders.register_resources(api)
+    reviews.register_resources(api)
