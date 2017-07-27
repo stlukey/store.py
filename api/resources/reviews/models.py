@@ -23,7 +23,7 @@ class Review(Document):
         return kwargs
 
     def __iter__(self):
-        yield 'name', User(self._doc['user'])._doc['first_name']
+        yield 'user', User(self._doc['user'])._doc['first_name'].title()
         for k, v in super().__iter__():
             if k != 'user':
                 yield k, v
