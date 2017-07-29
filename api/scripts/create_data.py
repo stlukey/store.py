@@ -35,8 +35,24 @@ def generate_pages():
 
     print(' ' * 4 * 2 + "Adding contact page...")
     Page.new(_id='contact', content='<h1>Contact</h1>')
+
     print(' ' * 4 * 2 + "Adding about page...")
     Page.new(_id='about', content='<h1>About</h1>')
+
+    print(' ' * 4 * 2 + "Adding press page...")
+    Page.new(_id='press', content='<h1>Press</h1>')
+
+    print(' ' * 4 * 2 + "Adding faqs page...")
+    Page.new(_id='faqs', content='<h1>FAQs</h1>')
+
+    print(' ' * 4 * 2 + "Adding delivery-and-returns page...")
+    Page.new(_id='delivery-and-returns', content='<h1>Delivery and Returns</h1>')
+
+    print(' ' * 4 * 2 + "Adding terms-and-conditions page...")
+    Page.new(_id='terms-and-conditions', content='<h1>Terms and Conditions</h1>')
+
+    print(' ' * 4 * 2 + "Adding privacy page...")
+    Page.new(_id='privacy', content='<h1>Privacy</h1>')
 
     print(' ' * 4 + "Complete!\n")
 
