@@ -4,7 +4,6 @@ bcrypt==3.1.1
 blinker==1.4
 cffi==1.9.1
 click==6.7
-cryptography==1.7.2
 easypost==3.4.0
 Flask==0.12.2
 Flask-Cors==3.0.3
@@ -17,7 +16,6 @@ gunicorn==19.6.0
 idna==2.5
 itsdangerous==0.24
 Jinja2==2.9.6
-jwt==0.5.2
 MarkupSafe==1.0
 passlib==1.7.0
 pyasn1==0.2.3
