@@ -55,7 +55,7 @@ class JSONResponse(object):
         elif isinstance(data, list):
             if len(data) == 0:
                 data = []
-            elif isinstance(data[0], Document):
+            elif isinstance(data[0], Document) or hasattr(data[0], '_id'):
                 data = map(dict, data)
         return data
 

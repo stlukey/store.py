@@ -1,4 +1,3 @@
-from flask import send_file, redirect
 from ...utils import Resource
 from . import models
 from bson.objectid import ObjectId
@@ -24,16 +23,6 @@ class Product(Resource):
         if not product['active']:
             return ERROR_PRODUCT_NOT_FOUND, 404
         return product
-
-
-class ProductImage(Resource_):
-    def get(self, id):
-        if id == 'placeholder':
-            return redirect('https://placehold.it/410x308')
-
-        id = ObjectId(id)
-        image = models.get_image(id)
-        return send_file(image, mimetype='image/jpeg')
 
 
 class Products(Resource):
@@ -79,7 +68,6 @@ def register_resources(api):
     api.add_resource(ProductsPopular, '/products/popular')
 
     api.add_resource(Product, '/products/<ObjectID:id>')
-    api.add_resource(ProductImage, '/images/<id>.jpg')
 
 
     api.add_resource(Categories, '/categories')

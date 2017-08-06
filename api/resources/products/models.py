@@ -1,6 +1,5 @@
 from flask import url_for
 from datetime import datetime
-from gridfs import GridFS
 
 from ...database import db, Document, ValidationError
 
@@ -9,21 +8,7 @@ def user_and_review_import():
     from ..users.models import User
     global User
 
-
-def upload_image(image):
-    fs = GridFS(db)
-    return fs.put(image)
-
-
-def delete_image(image_id):
-    fs = GridFS(db)
-    return fs.delete(image_id)
-
-
-def get_image(image_id):
-    fs = GridFS(db)
-    return fs.get(image_id)
-
+PLACEHOLDER_IMAGE_URL = '/images/placeholder.jpg'
 
 class Product(Document):
     _collection = db.products
@@ -78,28 +63,7 @@ class Product(Document):
                 ProductToCategory.new(product=self,
                                       category=cat)
 
-    @property
-    def thumbnail(self):
-        return Product.get_image(self['images'][0])
 
-    @thumbnail.setter
-    def thumbnail(self, image):
-        self.add_image(image, 0)
-
-    def add_image(self, image, index=None):
-        IMAGE_COUNT = len(self._doc['images'])
-
-        image_id = upload_image(image)
-        if index is None or (index not in range(IMAGE_COUNT)):
-            if index is None:
-                index = IMAGE_COUNT
-            self._doc['images'].insert(index, image_id)
-
-        else:
-            delete_image(self._doc['images'][index])
-            self._doc['images'][index] = image_id
-
-        self.update()
 
     @property
     def url_name(self):
@@ -110,14 +74,6 @@ class Product(Document):
 
     def __iter__(self):
         from ..reviews.models import Review
-        changes = {
-            'images': lambda imgs: [
-                url_for('productimage', id=img)
-                    for img in (imgs
-                        # If item has no images a placeholder will
-                        # be provided on request.
-                        if len(imgs) else ['placeholder'])],
-        }
 
         yield 'categories', {
             cat.id: cat.name for cat in self.categories
@@ -126,8 +82,8 @@ class Product(Document):
         yield 'reviews', map(dict, Review.find(product=self))
 
         for k, v in super(Product, self).__iter__():
-            if k in changes:
-                v = changes[k](v)
+            if k == 'images' and not v:
+                yield k, [PLACEHOLDER_IMAGE_URL]
             yield k, v
 
 

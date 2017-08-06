@@ -12,6 +12,7 @@ from . import cart
 from . import pages
 from . import orders
 from . import reviews
+from . import images
 
 
 
@@ -27,3 +28,4 @@ def register_resources(app):
     pages.register_resources(api)
     orders.register_resources(api)
     reviews.register_resources(api)
+    images.register_resources(api)

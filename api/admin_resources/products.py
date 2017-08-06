@@ -1,17 +1,13 @@
 from flask import request
 
 from ..utils import check_data, Resource
-from ..resources.products import (Products, Product, ProductImage,
+from ..resources.products import (Products, Product,
                                   Categories, pass_product)
 from ..resources.products import models
 
 ERROR_NOT_MODIFIED =\
 "An error occurred. Product has not been modified. Please try again."
-ERROR_IMAGE_NOT_FOUND = "The image could not be found."
 
-
-def valid_file(image):
-    return image.content_type == 'image/jpeg'
 
 
 class ProductsAdmin(Products):
@@ -48,7 +44,6 @@ class ProductsAdmin(Products):
         del data['length']
         del data['weight']
 
-        # data['parcel_id'] = None
 
         product = models.Product.new(**data)
         return product
@@ -62,7 +57,7 @@ class ProductAdmin(Product):
         ALLOWED = [
             'description', 'cost',
             'name', 'recipes', 'category_ids',
-            'active', 'stock',
+            'active', 'stock', 'images'
 
             'width', 'depth',
             'length', 'weight'
@@ -118,46 +113,9 @@ class ProductAdmin(Product):
         return product
 
 
-class ProductImageAdmin(Resource):
-    decorators = [pass_product]
-
-    def post(self, product, image_index):
-        for file in request.files:
-            if not valid_file(file):
-                return 400
-            product.add_image(file)
-
-        return product
-
-    def put(self, product, image_index):
-        if image_index > len(product['images']):
-            return ERROR_IMAGE_NOT_FOUND, 404
-
-        file = request.files['file']
-        if not valid_file(file):
-            return 400
-
-        file = file.stream.read()
-        if image_index == len(product['images']):
-            image_index = None
-        product.add_image(file, image_index)
-
-        return product
-
-    def delete(self, product, image_index):
-        if image_index >= len(product['images']):
-            return ERROR_IMAGE_NOT_FOUND, 404
-
-        del product['images'][image_index]
-        product.update()
-
 
 def register_resources(admin_api):
     admin_api.add_resource(ProductsAdmin, '/products')
     admin_api.add_resource(Categories, '/categories')
 
     admin_api.add_resource(ProductAdmin, '/products/<ObjectID:id>')
-    admin_api.add_resource(
-        ProductImageAdmin,
-        '/products/<ObjectID:id>/<int:image_index>'
-    )

@@ -5,9 +5,9 @@ Data management.
 import os
 import json
 
-
 from ..database import client
 from ..resources.products.models import Product, ProductToCategory, Category
+from ..resources.images.models import Image
 from ..resources.users.models import User
 from ..resources.pages.models import Page
 
@@ -24,7 +24,9 @@ def get_products():
     for product_file in product_files:
         with open(product_file + 'json') as f:
             product = json.load(f)
-        product['image'] = product_file + 'jpg'
+        with open(product_file + 'jpg', 'rb') as f:
+            image = Image.new(f)
+        product['image'] = image.url
         products.append(product)
 
     return products
@@ -85,10 +87,7 @@ def generate_products():
                 category=category
             )
 
-        with open(product_info['image'], 'rb') as src:
-            product.thumbnail = src.read()
-
-        product.update(dict(active=True))
+        product.update(dict(active=True, images=[product_info['image']]))
 
         print(' ' * 4 * 2 + "Complete!\n")
 

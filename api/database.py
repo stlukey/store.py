@@ -5,12 +5,13 @@ Minimal ORM for Mongodb
 :author: Luke Southam <luke@devthe.com>
 """
 
-
-from pymongo import MongoClient
 import os
+from pymongo import MongoClient
+from gridfs import GridFS
 
 client = MongoClient(os.environ.get('MONGODB_URI', 'localhost'))
 db = client[os.environ.get('MONGODB_NAME', 'online-store')]
+fs = GridFS(db)
 
 class ValidationError(Exception):
     @classmethod
