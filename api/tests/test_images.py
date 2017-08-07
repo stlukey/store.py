@@ -12,8 +12,9 @@ class TestProductImage(BaseApiTest):
 
         data = resp['data']
         for product in data:
-            rv = c.get(product['images'])
-            self.assertEqual(rv.status_code, 200)
+            for image in product['images']:
+                rv = c.get(image)
+                self.assertEqual(rv.status_code, 200)
 
 
 if __name__ == "__main__":

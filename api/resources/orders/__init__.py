@@ -9,11 +9,17 @@ from ..admin.models import Shipment
 from ...emails import order_confirmation
 
 ERROR_CHARGE_CREATION =\
-"An error occured while creating the charge. Please check your details."
+"""An error occured while creating the charge.
+Please check your details."""
 ERROR_ORDER_NOT_FOUND =\
 "That order could not be found."
 ERROR_ORDER_FORBIDDEN =\
 "That order is not accessible to you."
+ERROR_OUT_OF_STOCK =\
+"""Insufficent stock to complete your order.
+Your basket has been updated.
+Please review and try again."""
+
 ORDER_SUCCESSFUL =\
 "Order placed successfully."
 
@@ -42,7 +48,8 @@ class Orders(Resource):
         if not allowed:
             return resp
 
-        # TODO: Check and update stock
+        if not user.cart_in_stock:
+            return ERROR_OUT_OF_STOCK, 503
 
         # Compute Total
         sub_total, shipping = user.cart_sums
@@ -90,7 +97,7 @@ class Orders(Resource):
         order = OrderModel.new(**order_data)
         order_confirmation(user, order)
 
-        user.empty_cart()
+        user.empty_cart(update_stock=True)
 
         return (order, ORDER_SUCCESSFUL), 200
 

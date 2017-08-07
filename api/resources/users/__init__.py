@@ -13,13 +13,17 @@ ERROR_EMAIL_CONFLICT = "That email already exists."
 ERROR_BAD_LOGIN = "Incorrect email/password. Please try again."
 ERROR_NOT_ACTIVATED = "Account not activated. Please check your email."
 ERROR_BAD_EMAIL_TOKEN = "Email token invalid. Please try again."
+ERROR_RECOVERY_NO_EMAIL = "No email entered. Please try again."
 
 ACCOUNT_CREATED_MESSAGE = \
-"Account Created. Please check your email for an activation link."
+"""Account Created.
+Please check your email for an activation link."""
 ACCOUNT_ACTIVATED_MESSAGE = \
 "Account activated. Please login."
 RECOVER_EMAIL_SENT = \
-"If a matching account was found an email was sent to {} to allow you to reset your password."
+"""If a matching account was found,
+a password reset link has been emailed to:
+{}"""
 PASSWORD_CHANGED = \
 "Your password was updated. Please login. "
 LOGIN_SUCCESS = \
@@ -116,6 +120,9 @@ class ConfirmEmail(Resource):
 
 class RecoverPassword(Resource):
     def post(self, email):
+        if not email or email == "undefined":
+            return ERROR_RECOVERY_NO_EMAIL, 400
+
         user = User(email)
         if user.exists:
             recovery_email(user.id)

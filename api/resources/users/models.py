@@ -149,10 +149,30 @@ class User(Document):
 
         self['cart'][item] += 1
 
-    def empty_cart(self):
+    def empty_cart(self, update_stock=False):
         for item in list(self['cart']):
+            if update_stock:
+                p = Product(ObjectId(item))
+                p['stock'] -= self['cart'][item]
+                p.update()
+
             del self['cart'][item]
+
         self.update()
+
+    @property
+    def cart_in_stock(self):
+        avalible = True
+        for item in list(self['cart']):
+            p = Product(ObjectId(item))
+            if p['stock'] < self['cart'][item]:
+                if p['stock'] < 1:
+                    del self['cart'][item]
+                else:
+                    self['cart'][item] = p['stock']
+                avalible = False
+        self.update()
+        return avalible
 
     def update(self, set_=None, *args, **kwargs):
         format_cart = lambda cart: {

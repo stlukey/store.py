@@ -127,6 +127,9 @@ class Document(object):
     def __getitem__(self, item):
         return self._doc[item]
 
+    def __setitem__(self, item, value):
+        self._doc[item] = value
+
     @property
     def id(self):
         return self._doc['_id']

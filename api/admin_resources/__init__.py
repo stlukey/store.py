@@ -17,8 +17,8 @@ from . import images
 
 
 def register_resources(admin):
-    #if not TESTING:
-    admin.before_request(requires_admin)
+    if not TESTING:
+        admin.before_request(requires_admin)
 
     admin_api = Api(admin)
     admin_api.representations = {

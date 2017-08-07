@@ -7,7 +7,9 @@ from ..products import pass_product
 from ..products.models import Product
 
 ERROR_NOT_MODIFIED =\
-"An error occurred. Cart has not been modified. Please try again."
+"""An error occurred.
+Cart has not been modified.
+Please try again."""
 
 
 class Cart(Resource):
