@@ -7,7 +7,7 @@ import json
 
 from ..database import client
 from ..resources.products.models import Product, ProductToCategory, Category
-from ..resources.images.models import Image
+from ..resources.images.models import Image, SetImage
 from ..resources.users.models import User
 from ..resources.pages.models import Page
 
@@ -30,6 +30,26 @@ def get_products():
         products.append(product)
 
     return products
+
+def add_set_images():
+    print(' ' * 4 + "Adding set images...")
+
+    print(' ' * 4 * 2 + "Adding home.jpg...")
+    with open('data/home.jpg', 'rb') as f:
+        image = Image.new(f)
+    SetImage.new(_id='home', image=str(image._id))
+
+    print(' ' * 4 * 2 + "Adding background.jpg...")
+    with open('data/background.jpg', 'rb') as f:
+        image = Image.new(f)
+    SetImage.new(_id='background', image=str(image._id))
+
+    print(' ' * 4 * 2 + "Adding favicon.jpg...")
+    with open('data/favicon.jpg', 'rb') as f:
+        image = Image.new(f)
+    SetImage.new(_id='favicon', image=str(image._id))
+
+    print(' ' * 4 + "Complete!\n")
 
 
 def generate_pages():
@@ -130,6 +150,7 @@ def generate_admin():
 def create_sample():
     drop_db()
     print("Generating new database...")
+    add_set_images()
     generate_products()
     generate_pages()
     generate_user()

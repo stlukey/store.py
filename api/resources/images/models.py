@@ -1,4 +1,5 @@
 from ...database import fs
+from ...database import db, Document
 
 class Image(object):
     def __init__(self, image_id):
@@ -34,3 +35,10 @@ class Image(object):
     def __iter__(self):
         yield '_id', self._id
         yield 'url', self.url
+
+class SetImage(Document):
+    _collection = db.set_image
+    _schema = [
+        'image'
+    ]
+    _check = ['_id'] + _schema

@@ -4,7 +4,7 @@ from ..utils import check_data, Resource, JSONResponse
 from ..resources.images.models import Image
 
 IMAGE_UPLOADED_MESSAGE = "Image uploaded sucessfully."
-IMAGE_UPLOADED_MESSAGE = "Image deleted sucessfully."
+IMAGE_DELETED_MESSAGE = "Image deleted sucessfully."
 
 ERROR_IMAGE_NOT_FOUND = "The image could not be found."
 ERROR_INVALID_IMAGE = "The image is in a invalid format. " + \
@@ -33,7 +33,7 @@ class ImagesAdmin(Resource):
         if len(request.files) != 1:
             return ERROR_MULTIPLE_IMAGES, 400
 
-        f = request_files[0]
+        f = request.files['file']
         if not valid_file(f):
             return ERROR_INVALID_IMAGE, 400
 

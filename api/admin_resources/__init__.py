@@ -13,6 +13,7 @@ from . import orders
 from . import shipments
 from . import pages
 from . import images
+from . import appearance
 
 
 
@@ -31,3 +32,4 @@ def register_resources(admin):
     shipments.register_resources(admin_api)
     pages.register_resources(admin_api)
     images.register_resources(admin_api)
+    appearance.register_resources(admin_api)
