@@ -68,6 +68,20 @@ class CartItem(Resource):
 
         return cart
 
+class MultipleCartItem(Resource):
+    decorators = CartItem.decorators
+
+    def post(self, user, product, quantity):
+        cart = user['cart']
+        print(quantity)
+        quantity = cart.get(str(product.id), 0) + quantity
+        cart[str(product.id)] = quantity
+
+        res = user.update({'cart': cart})
+        if not res['nModified']:
+            return ERROR_NOT_MODIFIED, 500
+
+        return cart
 
 class CartCost(Resource):
     decorators = Cart.decorators
@@ -83,4 +97,5 @@ class CartCost(Resource):
 def register_resources(api):
     api.add_resource(Cart, '/cart')
     api.add_resource(CartItem, '/cart/<ObjectID:id>')
+    api.add_resource(MultipleCartItem, '/cart/<ObjectID:id>/<int:quantity>')
     api.add_resource(CartCost, '/cart/cost')
