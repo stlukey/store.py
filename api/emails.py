@@ -9,7 +9,7 @@ from .resources.users.activation import generate_confirmation_token
 
 sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
 
-#@async
+@async
 def send_email(subject, to, content):
     from_email = Email(SERVER_EMAIL)
     to_email = Email(to)
