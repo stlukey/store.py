@@ -27,7 +27,7 @@ class Product(Resource):
 
 class Products(Resource):
     def get(self):
-        return models.Product.find(active=True)[0].__iter__()
+        return models.Product.find(active=True)
 
 
 class ProductsLatest(Resource):

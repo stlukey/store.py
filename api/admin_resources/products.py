@@ -34,16 +34,17 @@ class ProductsAdmin(Products):
         data['active'] = False
 
         data['measurements'] = {
-            'width': data['width'],
-            'depth': data['depth'],
-            'length': data['length'],
-            'weight': data['weight'],
+            'width': float(data['width']),
+            'depth': float(data['depth']),
+            'length': float(data['length']),
+            'weight': float(data['weight']),
         }
         del data['width']
         del data['depth']
         del data['length']
         del data['weight']
 
+        data['cost'] = float(data['cost'])
 
         product = models.Product.new(**data)
         return product
