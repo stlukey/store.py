@@ -75,6 +75,8 @@ class Product(Document):
     def __iter__(self):
         from ..reviews.models import Review
 
+        yield 'images', self._doc['images'] if self._doc['images'] else [PLACEHOLDER_IMAGE_URL]
+
         yield 'categories', {
             cat.id: cat.name for cat in self.categories
         }
@@ -82,9 +84,8 @@ class Product(Document):
         yield 'reviews', map(dict, Review.find(product=self))
 
         for k, v in super(Product, self).__iter__():
-            if k == 'images' and not v:
-                yield k, [PLACEHOLDER_IMAGE_URL]
-            yield k, v
+            if k != 'images':
+                yield k, v
 
 
 class Category(Document):
