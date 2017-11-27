@@ -1,6 +1,5 @@
 from flask_restful import Api
 
-from flask import make_response
 from bson.json_util import dumps
 
 from ..utils import output_json
@@ -13,8 +12,6 @@ from . import pages
 from . import orders
 from . import reviews
 from . import images
-
-
 
 def register_resources(app):
     api = Api(app)

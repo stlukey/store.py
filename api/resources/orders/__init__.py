@@ -8,6 +8,15 @@ from ..admin.models import Shipment
 
 from ...emails import order_confirmation
 
+import paypalrestsdk
+
+paypalrestsdk.configure({
+    "mode": "sandbox", # sandbox or live
+    "client_id": "AUDVe4PIXHRyGJTsEWce8taryZPazwPBST-K4025LYGOg52c50pDQZ5kl7YTRp1kATOVkzx026NOplF1",
+    "client_secret": "EERmhFT8KJfz-I5xhWrNP0qZ5iUUtq7jbwT2lbMpkILSK3Zhda9C-X7XCPRvi2zaDayNKmX4CI0iB81X"
+})
+
+
 ERROR_CHARGE_CREATION =\
 """An error occured while creating the charge.
 Please check your details."""
@@ -41,7 +50,8 @@ class Orders(Resource):
         ]
         ALLOWED = REQUIRED + [
             'line2',
-            'line3'
+            'line3',
+            'paypal'
         ]
         data = request.get_json(force=True)
         allowed, resp = check_data(data, ALLOWED, REQUIRED)
@@ -58,26 +68,39 @@ class Orders(Resource):
 
         # Process payment
         try:
-            charge = stripe.Charge.create(
-                amount=total,
-                currency="GBP",
-                source=data['card_token'],
-                description="Charge for {} {} <{}>".format(
-                    user['first_name'],
-                    user['last_name'],
-                    user.id
+            if data['card_token']['type'] == "paypal":
+                charge = paypalrestsdk.Payment.find(data['card_token']['data']['paymentID'])
+                total_c = float(charge['transactions'][0]['amount']['total'])
+                total_c = int(round(total_c, 2) * 100)
+
+                if total != total_c:
+                    raise Exception()
+
+                if not charge.execute({'payer_id' : data['card_token']['data']['payerID']}):
+                    raise Exception()
+
+
+            else:
+                charge = stripe.Charge.create(
+                    amount=total,
+                    currency="GBP",
+                    source=data['card_token']   ['data'],
+                    description="Charge for {} {} <{}>".format(
+                        user['first_name'],
+                        user['last_name'],
+                        user.id
+                    )
                 )
-            )
         except Exception as e:
             return ERROR_CHARGE_CREATION, 400
-
 
         order_data = {
             'user': user,
             'items': user['cart'],
             'payment': {
                 'amount': total,
-                #'id': charge['id']
+                'id': charge['id'],
+                'data': charge
             },
             'shipping': {
                 'address': {
