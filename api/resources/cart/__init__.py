@@ -5,6 +5,7 @@ from ...utils import Resource, check_data
 from ..users.models import *
 from ..products import pass_product
 from ..products.models import Product
+from ...emails import items_in_cart as email
 
 ERROR_NOT_MODIFIED =\
 """An error occurred.
@@ -94,8 +95,20 @@ class CartCost(Resource):
         }
 
 
+class CartEmail(Resource):
+    decorators = Cart.decorators
+
+    def post(self, user):
+        if not sum(user['cart'].values()):
+            return
+
+        email(user)
+
+        return 200
+
 def register_resources(api):
     api.add_resource(Cart, '/cart')
     api.add_resource(CartItem, '/cart/<ObjectID:id>')
     api.add_resource(MultipleCartItem, '/cart/<ObjectID:id>/<int:quantity>')
     api.add_resource(CartCost, '/cart/cost')
+    api.add_resource(CartEmail, '/cart/email')

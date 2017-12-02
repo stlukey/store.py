@@ -18,6 +18,12 @@ def send_email(subject, to, content):
     return sg.client.mail.send.post(request_body=mail.get())
 
 
+def items_in_cart(user):
+    send_email("Complete Your Purchase",
+               user.id,
+               render_template("complete-purchase.txt",
+                               user=user, items=sum(user['cart'].values())))
+
 def order_confirmation(user, order):
     send_email("Order Confirmation",
                user.id,
