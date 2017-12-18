@@ -4,6 +4,7 @@ Main application.
 """
 
 import os
+import logging
 
 from flask import Flask, Blueprint, url_for, request
 import appenlight_client.ext.flask as appenlight
@@ -48,6 +49,9 @@ register_resources(app)
 register_admin_resources(admin)
 
 app.register_blueprint(admin)
+
+app.logger.addHandler(logging.StreamHandler(sys.stdout))
+app.logger.setLevel(logging.ERROR)
 
 def main():
     app.run(threaded=True)
