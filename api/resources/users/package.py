@@ -7,6 +7,7 @@ def measurements_sum(measurements):
             "weight": 0
         }
 
+    print(measurements)
     total = measurements[0]
     for measurement in measurements[1:]:
         total = {

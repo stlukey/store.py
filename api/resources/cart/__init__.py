@@ -17,6 +17,7 @@ class Cart(Resource):
     decorators = [requires_token]
 
     def get(self, user):
+        user.remove_inactive_items()
         return user['cart']
 
     def delete(self, user):

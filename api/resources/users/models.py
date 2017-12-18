@@ -160,6 +160,17 @@ class User(Document):
 
         self.update()
 
+
+    def remove_inactive_items(self):
+        cart = self['cart']
+        for item in list(cart):
+            p = Product(ObjectId(item))
+            if not p['active']:
+                del cart[item]
+
+        self.update({'cart': cart})
+
+
     @property
     def cart_in_stock(self):
         avalible = True

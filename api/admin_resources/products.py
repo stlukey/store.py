@@ -7,7 +7,8 @@ from ..resources.products import models
 
 ERROR_NOT_MODIFIED =\
 "An error occurred. Product has not been modified. Please try again."
-
+ERROR_INVALID_MESUREMENTS =\
+"Invalid Mesurements. Please modify and try again."
 
 
 class ProductsAdmin(Products):
@@ -90,13 +91,18 @@ class ProductAdmin(Product):
         if 'stock' in data:
             data['stock'] = int(data['stock'])
 
-        measurements = {}
-        for measurement in ['width', 'depth', 'length', 'weight']:
-            if measurement in data:
-                measurements[measurement] = data[measurement]
-                del data[measurement]
-        if measurements != {}:
-            data['measurements'] = measurements
+        try:
+            measurements = {}
+            for measurement in ['width', 'depth', 'length', 'weight']:
+                if measurement in data and data[measurement]:
+                    measurements[measurement] = float(data[measurement])
+                    del data[measurement]
+                elif measurement in product['measurements']:
+                    measurements[measurement] = product['measurements'][measurement]
+            if measurements != {}:
+                data['measurements'] = measurements
+        except ValueError:
+            return 400, ERROR_INVALID_MESUREMENTS
 
 
         kwargs = {}

@@ -113,6 +113,19 @@ def generate_products():
 
     print(' ' * 4 + "Complete!\n")
 
+def fix_dimentions():
+    for p in Product.find():
+        p.update({'measurements': {
+            "width": 1,
+            "depth": 1,
+            "length": 1,
+            "weight": 0.01
+        }})
+
+
+def empty_cart():
+    for u in User.find():
+        u.update({'cart': {}})
 
 def generate_user():
     print(' ' * 4 + "Adding user..")
@@ -160,3 +173,5 @@ def create_sample():
 
 if __name__ == '__main__':
     create_sample()
+    # fix_dimentions()
+    # empty_cart();
