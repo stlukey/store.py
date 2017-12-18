@@ -5,6 +5,7 @@ Main application.
 
 import os
 import logging
+import sys
 
 from flask import Flask, Blueprint, url_for, request
 import appenlight_client.ext.flask as appenlight
