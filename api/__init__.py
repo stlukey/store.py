@@ -36,7 +36,7 @@ def before():
 
 if os.environ['APPENLIGHT_API_KEY']:
     app = appenlight.add_appenlight(app,
-        {'appenlight.api_key':os.environ['APPENLIGHT_API_KEY']})
+        {'appenlight.api_key': os.environ['APPENLIGHT_API_KEY']})
 
 
 from .utils import ObjectIDConverter

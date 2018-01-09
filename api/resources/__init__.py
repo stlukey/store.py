@@ -12,6 +12,7 @@ from . import pages
 from . import orders
 from . import reviews
 from . import images
+from . import mailing_list
 
 def register_resources(app):
     api = Api(app)
@@ -26,3 +27,4 @@ def register_resources(app):
     orders.register_resources(api)
     reviews.register_resources(api)
     images.register_resources(api)
+    mailing_list.register_resources(api)

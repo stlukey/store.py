@@ -1,6 +1,7 @@
 from flask import request, make_response
 from ...utils import Resource, check_data
 from .models import *
+from validate_email import validate_email
 
 from ...emails import email_activation, recovery_email
 
@@ -9,6 +10,7 @@ from ...utils import JSONResponse
 
 import datetime
 
+ERROR_EMAIL_INVALID = "The entered email address is invalid. Please try again."
 ERROR_EMAIL_CONFLICT = "That email already exists."
 ERROR_BAD_LOGIN = "Incorrect email/password. Please try again."
 ERROR_NOT_ACTIVATED = "Account not activated. Please check your email."
@@ -60,6 +62,9 @@ class Users(Resource):
 
             # If user has not activated email for more than 24 hours.
             user.delete()
+
+        if not validate_email(data['_id']):
+            return ERROR_EMAIL_INVALID, 400
 
         data['first_name'] = data['first_name'].title()
         data['last_name'] = data['last_name'].title()
@@ -155,5 +160,6 @@ class RecoverPassword(Resource):
 def register_resources(api):
     api.add_resource(Users, '/user')
     api.add_resource(ConfirmEmail, '/confirm/<string:email_token>')
-    api.add_resource(RecoverPassword, '/recover/<string:email>')
-    api.add_resource(UserToken, '/token/<string:email>')
+    api.add_resource(RecoverPassword, '/recover/<email>')
+
+    api.add_resource(UserToken, '/token/<email>')
