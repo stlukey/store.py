@@ -14,12 +14,12 @@ from . import shipments
 from . import pages
 from . import images
 from . import appearance
+from . import mailing_list
 
 
 
 def register_resources(admin):
-    if not TESTING:
-        admin.before_request(requires_admin)
+    admin.before_request(requires_admin)
 
     admin_api = Api(admin)
     admin_api.representations = {
@@ -33,3 +33,4 @@ def register_resources(admin):
     pages.register_resources(admin_api)
     images.register_resources(admin_api)
     appearance.register_resources(admin_api)
+    mailing_list.register_resources(admin_api)

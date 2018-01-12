@@ -2,6 +2,7 @@ from ...utils import Resource
 from . import models
 
 from validate_email import validate_email
+from ...emails import mailing_list_confirmation
 
 ERROR_EMAIL_EXISTS =\
 "Error: That email already exists."
@@ -21,6 +22,7 @@ class Subscriber(Resource):
             return ERROR_EMAIL_EXISTS, 400
 
         models.Subscriber.new(email=email)
+        mailing_list_confirmation(email=email)
         return SUBSCRIBER_ADDED_MESSAGE, 200
 
     def delete(self, email):
@@ -33,4 +35,4 @@ class Subscriber(Resource):
 
 
 def register_resources(api):
-    api.add_resource(Subscriber, '/subscriber/<email>')
+    api.add_resource(Subscriber, '/subscribers/<email>')
