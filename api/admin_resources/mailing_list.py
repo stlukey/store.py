@@ -39,7 +39,6 @@ class SendMail(Resource):
         return EMAIL_SENT_MESSAGE, 200
 
 
-
 def register_resources(admin_api):
     admin_api.add_resource(SendMail, '/sendmail')
     admin_api.add_resource(Subscribers, '/subscribers')
