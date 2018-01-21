@@ -1,4 +1,5 @@
 from flask import request
+from bson.objectid import ObjectId
 
 from ..utils import check_data, Resource
 from ..resources.products import (Products, Product,
@@ -9,11 +10,28 @@ ERROR_NOT_MODIFIED =\
 "An error occurred. Product has not been modified. Please try again."
 ERROR_INVALID_MESUREMENTS =\
 "Invalid Mesurements. Please modify and try again."
+ERROR_RELATED_PRODUCT_NOT_FOUND=\
+"Related product not found."
+
+RELATED_PRODUCT_ADDED =\
+"Item added to related products."
+RELATED_PRODUCT_REMOVED =\
+"Item removed from related products."
+
 
 
 class ProductsAdmin(Products):
     def get(self):
-        return models.Product.find()
+        products = list(models.Product.find(active=True))
+        for i in range(len(products)):
+            related = []            
+            for related_id in products[i]['related'].keys():
+                related_product = dict(models.Product(ObjectId(related_id)))
+                del related_product['related']
+                related.append(dict(related_product))
+            products[i]['related'] = related
+
+        return products
 
     def post(self):
         REQUIRED = [
@@ -53,6 +71,14 @@ class ProductsAdmin(Products):
 
 class ProductAdmin(Product):
     def get(self, product):
+        related = []            
+        for related_id in product['related'].keys():
+            related_product = dict(models.Product(ObjectId(related_id)))
+            del related_product['related']
+            related.append(dict(related_product))
+
+        product['related'] = related
+
         return product
 
     def put(self, product):
@@ -119,10 +145,28 @@ class ProductAdmin(Product):
 
         return product
 
+class ProductsRelated(Resource):
+    decorators = [pass_product]
+    def put(self, product, related_id):
+        if not models.Product(related_id).exists:
+            return ERROR_RELATED_PRODUCT_NOT_FOUND, 404
 
+        product['related'][str(related_id)] = True
+        product.update()
+        return RELATED_PRODUCT_ADDED, 200
+
+    def delete(self, product, related_id):
+        try:
+            del product['related'][str(related_id)]
+        except KeyError:
+            return ERROR_RELATED_PRODUCT_NOT_FOUND, 400
+        product.update()
+        return RELATED_PRODUCT_REMOVED, 200
+        
 
 def register_resources(admin_api):
     admin_api.add_resource(ProductsAdmin, '/products')
     admin_api.add_resource(Categories, '/categories')
 
     admin_api.add_resource(ProductAdmin, '/products/<ObjectID:id>')
+    admin_api.add_resource(ProductsRelated, '/products/<ObjectID:id>/related/<ObjectID:related_id>')

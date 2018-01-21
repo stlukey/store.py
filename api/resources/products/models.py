@@ -21,6 +21,7 @@ class Product(Document):
         'recipes',  # ['name', 'url']
         'images',
         'active',
+        'related',
 
         {
             'measurements': [
@@ -39,6 +40,7 @@ class Product(Document):
             **kwargs,
             'images': [],
             'datetime': datetime.now(),
+            'related': {},
             'active': False
         }
 

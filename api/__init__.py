@@ -10,7 +10,6 @@ import sys
 from flask import Flask, Blueprint, url_for, request
 import appenlight_client.ext.flask as appenlight
 
-
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 app.config.from_pyfile('config.py')

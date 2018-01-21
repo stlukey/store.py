@@ -169,9 +169,10 @@ def create_sample():
     generate_user()
     generate_admin()
     print("Complete!\n")
-
+    
 
 if __name__ == '__main__':
     create_sample()
+    #fix_products()
     # fix_dimentions()
     # empty_cart();

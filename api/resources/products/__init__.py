@@ -2,6 +2,7 @@ from ...utils import Resource
 from . import models
 from bson.objectid import ObjectId
 from flask_restful import Resource as Resource_
+from bson.objectid import ObjectId
 
 ERROR_PRODUCT_NOT_FOUND =  "That product can not be found."
 ERROR_CATEGORY_NOT_FOUND = "That category can not be found."
@@ -22,12 +23,31 @@ class Product(Resource):
     def get(self, product):
         if not product['active']:
             return ERROR_PRODUCT_NOT_FOUND, 404
+    
+        related = []            
+        for related_id in product['related'].keys():
+            related_product = dict(models.Product(ObjectId(related_id)))
+            del related_product['related']
+            if related_product['active']:
+                related.append(dict(related_product))
+        product['related'] = related
+
         return product
 
 
 class Products(Resource):
     def get(self):
-        return models.Product.find(active=True)
+        products = list(models.Product.find(active=True))
+        for i in range(len(products)):
+            related = []            
+            for related_id in products[i]['related'].keys():
+                related_product = dict(models.Product(ObjectId(related_id)))
+                del related_product['related']
+                if related_product['active']:
+                    related.append(dict(related_product))
+            products[i]['related'] = related
+
+        return products
 
 
 class ProductsLatest(Resource):
