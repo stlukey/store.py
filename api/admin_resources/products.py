@@ -19,17 +19,22 @@ RELATED_PRODUCT_REMOVED =\
 "Item removed from related products."
 
 
+def fix_related(product):
+    related = []            
+    for related_id in product['related'].keys():
+        related_product = dict(models.Product(ObjectId(related_id)))
+        del related_product['related']
+        related.append(dict(related_product))
+
+    product['related'] = related
+
+    return product
 
 class ProductsAdmin(Products):
     def get(self):
-        products = list(models.Product.find(active=True))
+        products = list(models.Product.find())
         for i in range(len(products)):
-            related = []            
-            for related_id in products[i]['related'].keys():
-                related_product = dict(models.Product(ObjectId(related_id)))
-                del related_product['related']
-                related.append(dict(related_product))
-            products[i]['related'] = related
+            products[i] = fix_related(products[i])
 
         return products
 
@@ -66,20 +71,12 @@ class ProductsAdmin(Products):
         data['cost'] = float(data['cost'])
 
         product = models.Product.new(**data)
-        return product
+        return fix_related(product)
 
 
 class ProductAdmin(Product):
     def get(self, product):
-        related = []            
-        for related_id in product['related'].keys():
-            related_product = dict(models.Product(ObjectId(related_id)))
-            del related_product['related']
-            related.append(dict(related_product))
-
-        product['related'] = related
-
-        return product
+        return fix_related(product)
 
     def put(self, product):
         ALLOWED = [
@@ -143,7 +140,7 @@ class ProductAdmin(Product):
             if not res['nModified']:
                 return ERROR_NOT_MODIFIED, 500
 
-        return product
+        return fix_related(product)
 
 class ProductsRelated(Resource):
     decorators = [pass_product]
