@@ -90,7 +90,8 @@ def generate_products():
             description=product_info['description'],
             stock=product_info['stock'],
             recipes=product_info['links'],
-            measurements=product_info['measurements']
+            measurements=product_info['measurements'],
+            related={}
         )
 
         for category_name in product_info['categories']:
