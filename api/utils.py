@@ -111,19 +111,24 @@ class Resource(Resource):
         return view(*args, **kwargs)
 
 
+def fix_id(k):
+    if k == '_id':
+        return 'email'
+    return k
+
 def check_data(data, allowed=[], required=False):
-    BAD_REQUEST = "There was an error processing the request. '{}' is invalid"
-    BAD_REQUEST_REQUIRED = "There was an error processing the request. Required value '{}' is missing."
+    BAD_REQUEST = "There was an error processing the request.\n'{}' is invalid"
+    BAD_REQUEST_REQUIRED = "There was an error processing the request.\nRequired value '{}' is missing."
     BAD_REQUEST_CODE = 400
 
     for k in data:
         if k not in allowed:
-            return False, (BAD_REQUEST.format(k), BAD_REQUEST_CODE)
+            return False, (BAD_REQUEST.format(fix_id(k)), BAD_REQUEST_CODE)
 
     if required:
         for k in required:
             if k not in data:
-                return False, (BAD_REQUEST_REQUIRED.format(k),
+                return False, (BAD_REQUEST_REQUIRED.format(fix_id(k)),
                                BAD_REQUEST_CODE)
 
     return True, None

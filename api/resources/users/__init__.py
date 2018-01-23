@@ -3,10 +3,12 @@ from ...utils import Resource, check_data
 from .models import *
 from validate_email import validate_email
 
-from ...emails import email_activation, recovery_email
+from ...emails import email_activation, recovery_email, mailing_list_confirmation
 
 from .activation import confirm_email_token
 from ...utils import JSONResponse
+from ..mailing_list.models import Subscriber
+
 
 import datetime
 
@@ -45,7 +47,7 @@ class Users(Resource):
         REQUIRED = [
             '_id', 'password',
             'first_name', 'last_name',
-            'contact_number'
+            'contact_number', 'subscribe'
         ]
         data = request.get_json(force=True)
         allowed, resp = check_data(data, REQUIRED, REQUIRED)
@@ -69,9 +71,17 @@ class Users(Resource):
         data['first_name'] = data['first_name'].title()
         data['last_name'] = data['last_name'].title()
 
+        subscribe = data['subscribe']
+        del data['subscribe']
 
         user = User.new(**data)
+
+        if subscribe and not Subscriber(email=data['_id']).exists:
+            Subscriber.new(email=data['_id'])
+            mailing_list_confirmation(email=data['_id'])
+
         email_activation(user.id)
+
         return ACCOUNT_CREATED_MESSAGE, 200
 
     def put(self, user):
