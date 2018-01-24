@@ -137,8 +137,6 @@ class ProductAdmin(Product):
 
         if data:
             res = product.update(**kwargs)
-            if not res['nModified']:
-                return ERROR_NOT_MODIFIED, 500
 
         return fix_related(product)
 
