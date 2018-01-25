@@ -12,6 +12,8 @@ ERROR_INVALID_MESUREMENTS =\
 "Invalid Mesurements. Please modify and try again."
 ERROR_RELATED_PRODUCT_NOT_FOUND=\
 "Related product not found."
+ERROR_INVALID_COST =\
+"Invalid cosrt. Please modify and try again."
 
 RELATED_PRODUCT_ADDED =\
 "Item added to related products."
@@ -115,6 +117,12 @@ class ProductAdmin(Product):
             data['stock'] = int(data['stock'])
 
         try:
+            if 'cost' in data:
+                data['cost'] = float(data['cost'])
+        except ValueError:
+            return ERROR_INVALID_COST, 400
+
+        try:
             measurements = {}
             for measurement in ['width', 'depth', 'length', 'weight']:
                 if measurement in data and data[measurement]:
@@ -125,7 +133,7 @@ class ProductAdmin(Product):
             if measurements != {}:
                 data['measurements'] = measurements
         except ValueError:
-            return 400, ERROR_INVALID_MESUREMENTS
+            return ERROR_INVALID_MESUREMENTS, 400
 
 
         kwargs = {}
