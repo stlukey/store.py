@@ -48,7 +48,7 @@ class PackageSize(object):
             w = w['weight']
 
         for k in sorted(self.cost.keys()):
-            if w < k:
+            if w <= k:
                 w = k
                 break
 
