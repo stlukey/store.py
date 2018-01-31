@@ -62,7 +62,7 @@ class ProductsPopular(Resource):
     def get(self):
         return [
             product for product in models.Product.find(active=True)
-                if 'popular' in [product.id for product in
+                if 'customer-favourites' in [cat.id for cat in
                                     product.categories]
         ]
 
