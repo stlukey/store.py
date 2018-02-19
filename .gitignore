@@ -1,6 +1,8 @@
 .idea/
 
 configs/production
+configs/development
+
 webpack/
 node_modules/
 
