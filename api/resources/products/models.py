@@ -3,27 +3,32 @@ from datetime import datetime
 
 from ...database import db, Document, ValidationError
 
-
+# Avoid circular import.
 def user_and_review_import():
     from ..users.models import User
+    from ..reviews.models import Review
     global User
+    global Review
 
 PLACEHOLDER_IMAGE_URL = '/images/placeholder.jpg'
 
 class Product(Document):
+    # Collection name.
     _collection = db.products
+    
+    # Dooument Feilds
     _schema = [
         'description',
         'datetime',
         'cost',
         'stock',
         'name',
-        'recipes',  # ['name', 'url']
+        'recipes',  # Recipe(['name', 'url'])
         'images',
         'active',
         'related',
 
-        {
+        { # Embeded Document.
             'measurements': [
                 'width',
                 'depth',
@@ -32,10 +37,14 @@ class Product(Document):
             ]
         }
     ]
+    # Everything but embedded document is required.
     _check = _schema[:-1]
 
     @staticmethod
     def _format_new(**kwargs):
+        """
+        On creation, set defaults.
+        """
         return {
             **kwargs,
             'images': [],
@@ -43,14 +52,22 @@ class Product(Document):
             'related': {},
             'active': False
         }
+    
+    # End of MinimalMongo defintions.
 
     @property
     def categories(self):
+        """
+        Load categories for product, many to many relationship.
+        """
         return [Category(p2c['category'])
                 for p2c in ProductToCategory.find(product=self.id)]
 
     @categories.setter
     def categories(self, category_ids):
+        """
+        Save categories for product, many to many relationship.
+        """
         current = ProductToCategory.find(product=self.id)
         for p2c in current:
             if p2c['category'] not in category_ids:
@@ -65,8 +82,6 @@ class Product(Document):
                 ProductToCategory.new(product=self,
                                       category=cat)
 
-
-
     @property
     def url_name(self):
         """
@@ -75,8 +90,9 @@ class Product(Document):
         return '-'.join(self['name'].lower().split())
 
     def __iter__(self):
-        from ..reviews.models import Review
-
+        """
+        Yeild images, categories and reviews when iterated.
+        """
         yield 'images', self._doc['images'] if self._doc['images'] else [PLACEHOLDER_IMAGE_URL]
 
         yield 'categories', {
